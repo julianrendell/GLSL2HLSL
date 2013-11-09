@@ -9,6 +9,6 @@ namespace AngleCLR
 	public ref class AngleCLRTest
 	{
 		public:
-			String ^ Draw();
+			String ^ Hello();
 	};
 }

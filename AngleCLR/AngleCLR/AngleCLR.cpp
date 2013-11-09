@@ -7,9 +7,9 @@
 using namespace AngleCLR;
 using namespace std;
 
-String ^ AngleCLR::AngleCLRTest::Draw()
+String ^ AngleCLR::AngleCLRTest::Hello()
 {
-	string result = TaDa();
+	string result = HelloWorld();
 	String ^ greeting = gcnew String(result.c_str());
 
 	return greeting;
