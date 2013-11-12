@@ -7,7 +7,7 @@ using namespace System;
 int main(array<System::String ^> ^args)
 {
     AngleCLR::AngleCLRTest ^ a = gcnew AngleCLR::AngleCLRTest();
-	Console::WriteLine(a->Draw());
+	Console::WriteLine(a->Hello());
 	Console::ReadKey();
 
     return 0;
