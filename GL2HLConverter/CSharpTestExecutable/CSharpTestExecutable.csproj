@@ -47,12 +47,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CPPCLRNativeWrapperLibrary\CPPCLRNativeWrapperLibrary.vcxproj">
-      <Project>{c9b612a3-b55f-4bd4-bf67-eb7b37edadb5}</Project>
-      <Name>CPPCLRNativeWrapperLibrary</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y $(SolutionDir)\$(ConfigurationName)\NativeCPPLibrary.* $(TargetDir)</PostBuildEvent>
