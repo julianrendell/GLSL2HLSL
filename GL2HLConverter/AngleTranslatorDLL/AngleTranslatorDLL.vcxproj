@@ -57,8 +57,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\angleproject\src\;$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\angleproject\src\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>translator.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

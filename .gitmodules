@@ -1,0 +1,3 @@
+[submodule "angleproject"]
+	path = angleproject
+	url = https://code.google.com/p/angleproject/
