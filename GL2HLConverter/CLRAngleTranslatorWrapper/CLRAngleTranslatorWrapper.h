@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GLSLANG/ShaderLang.h"
+#include "AngleTranslatorDLL.h"
 using namespace System;
 using namespace System::Runtime::InteropServices; 
 

@@ -4,23 +4,7 @@
 #include "stdafx.h"
 #include "AngleTranslatorDLL.h"
 
-// This is an example of an exported variable
-ANGLETRANSLATORDLL_API int nAngleTranslatorDLL=0;
-
-// This is an example of an exported function.
-ANGLETRANSLATORDLL_API int fnAngleTranslatorDLL(void)
-{
-	return 42;
-}
-
-// This is the constructor of a class that has been exported.
-// see AngleTranslatorDLL.h for the class definition
-CAngleTranslatorDLL::CAngleTranslatorDLL()
-{
-	return;
-}
-
-int Initialize()
+ANGLETRANSLATORDLL_API int Initialize()
 {
 	return ShInitialize();
 }

@@ -58,7 +58,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\angleproject\src\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>translator.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>translator.lib;preprocessor.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>

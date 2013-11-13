@@ -48,7 +48,7 @@ CLRAngleTranslator::!CLRAngleTranslator()
 String^ CLRAngleTranslator::DoIt(String^ input) {
 	String^ netString = gcnew String("Hello World");
 
-	int ret = ShInitialize();
+	int ret = Initialize();
 
 	return netString;
 }

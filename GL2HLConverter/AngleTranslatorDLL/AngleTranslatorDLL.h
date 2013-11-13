@@ -12,23 +12,12 @@
 
 #include "GLSLANG\ShaderLang.h"
 
-// This class is exported from the AngleTranslatorDLL.dll
-class ANGLETRANSLATORDLL_API CAngleTranslatorDLL {
-public:
-	CAngleTranslatorDLL(void);
-	// TODO: add your methods here.
+ANGLETRANSLATORDLL_API int Initialize();
 
-	int Initialize();
-
-	ShHandle ConstructCompiler();
-
-	int Compile();
-
-	void Destruct();
-
-	int Finalize();
-};
-
-extern ANGLETRANSLATORDLL_API int nAngleTranslatorDLL;
-
-ANGLETRANSLATORDLL_API int fnAngleTranslatorDLL(void);
+//ANGLETRANSLATORDLL_API ShHandle ConstructCompiler();
+//
+//ANGLETRANSLATORDLL_API int Compile();
+//
+//ANGLETRANSLATORDLL_API void Destruct();
+//
+//ANGLETRANSLATORDLL_API int Finalize();
