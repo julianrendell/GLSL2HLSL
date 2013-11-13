@@ -53,3 +53,5 @@ A simple fix is to add a post-build step something like:
 
 Noting that `ConfigurationName` has to be consistent across all dependant projects.
 
+Also when the C++ CLR wrapper is `clean`ed, the `DLL` is removed, and you will see Intellisense errors. Rebuild to make everything happy.
+
