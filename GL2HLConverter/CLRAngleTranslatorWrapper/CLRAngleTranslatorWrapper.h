@@ -10,15 +10,21 @@ namespace CLRAngleTranslatorWrapper {
 
 	public ref class CLRAngleTranslator
 	{
-		// TODO: Add your methods for this class here.
-	public:
+	private:
 		CLRAngleTranslator();
-        virtual ~CLRAngleTranslator(void); 
+
+		CLRAngleTranslator(const CLRAngleTranslator%);
+		static CLRAngleTranslator ^ instance = nullptr;
+
+	public:
+		static property CLRAngleTranslator^ Instance { CLRAngleTranslator^ get(); };
+
+        ~CLRAngleTranslator();
 
 		String ^ DoIt( String^ input);
 
 	protected: 
-        !CLRAngleTranslator(void);
+        !CLRAngleTranslator();
 	};
 }
 

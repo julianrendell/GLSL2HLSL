@@ -10,20 +10,45 @@ using namespace msclr::interop;
 #include "CLRAngleTranslatorWrapper.h"
 using namespace CLRAngleTranslatorWrapper; 
 
-CLRAngleTranslator::CLRAngleTranslator(void) 
+CLRAngleTranslator ^ CLRAngleTranslator::Instance::get()
+{
+	if (instance == nullptr) {
+			instance = gcnew CLRAngleTranslator();
+		}
+		return instance; 
+}
+
+
+CLRAngleTranslator::CLRAngleTranslator()
+{
+	/*int ret = ShInitialize();
+
+	if (ret != 0)
+	{
+		throw gcnew ApplicationException("Could not initialize Angle translate library");
+	}*/
+}
+
+CLRAngleTranslator::CLRAngleTranslator(const CLRAngleTranslator%)
 { 
-} 
- 
-CLRAngleTranslator::~CLRAngleTranslator(void) 
-{ 
-} 
- 
-CLRAngleTranslator::!CLRAngleTranslator(void) 
-{ 
-} 
+	throw gcnew System::InvalidOperationException("singleton cannot be copy-constructed");
+}
+
+
+CLRAngleTranslator::~CLRAngleTranslator()
+{
+	this->!CLRAngleTranslator();
+}
+
+CLRAngleTranslator::!CLRAngleTranslator()
+{
+	//ShFinalize();
+}
 
 String^ CLRAngleTranslator::DoIt(String^ input) {
 	String^ netString = gcnew String("Hello World");
+
+	int ret = ShInitialize();
 
 	return netString;
 }

@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-using CPPCLRNativeWrapperLibrary; 
+using CLRAngleTranslatorWrapper;
 
 namespace CSharpTestExecutable
 {
@@ -15,8 +9,8 @@ namespace CSharpTestExecutable
         {
            	Console.WriteLine(@"Hello there!");
 
-            var cppClrWrapper = new CPPCLRWrapper();
-            var output = cppClrWrapper.DoIt(@"String from C# excecutable"); 
+            var clrAngleTranslator = Cl();
+            var output = clrAngleTranslator.DoIt(@"String from C# excecutable"); 
 
             Console.WriteLine(@"Output from calling CLR wrapper library code:");
 	        Console.WriteLine(output);
