@@ -12,12 +12,25 @@
 
 #include "GLSLANG\ShaderLang.h"
 
-ANGLETRANSLATORDLL_API int Initialize();
+ANGLETRANSLATORDLL_API int ShaderInitialize();
 
-//ANGLETRANSLATORDLL_API ShHandle ConstructCompiler();
-//
-//ANGLETRANSLATORDLL_API int Compile();
-//
-//ANGLETRANSLATORDLL_API void Destruct();
-//
-//ANGLETRANSLATORDLL_API int Finalize();
+ANGLETRANSLATORDLL_API ShHandle ShaderConstructCompiler(ShShaderType type,
+    ShShaderSpec spec,
+    ShShaderOutput output,
+    const ShBuiltInResources* resources);
+
+ANGLETRANSLATORDLL_API int ShaderCompile(const ShHandle handle,
+    const char* const shaderStrings[],
+    size_t numStrings,
+    int compileOptions
+    );
+
+ANGLETRANSLATORDLL_API void ShaderDestruct(ShHandle handle);
+
+ANGLETRANSLATORDLL_API int ShaderFinalize();
+
+ANGLETRANSLATORDLL_API void ShaderInitBuiltInResources(ShBuiltInResources* resources);
+
+ANGLETRANSLATORDLL_API void ShaderGetInfo(const ShHandle handle, ShShaderInfo pname, size_t* params);
+
+ANGLETRANSLATORDLL_API void ShaderGetObjectCode(const ShHandle handle, char* objCode);

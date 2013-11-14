@@ -9,16 +9,19 @@ namespace CSharpTestExecutable
         {
            	Console.WriteLine(@"Hello there!");
 
-            var clrAngleTranslator = Cl();
-            var output = clrAngleTranslator.DoIt(@"String from C# excecutable"); 
+            var clrAngleTranslator = CLRAngleTranslator.Instance;
+            var ret = clrAngleTranslator.ConvertToHLSL(@"precision mediump float;
+                                                      void main()                                  
+                                                      {                                            
+                                                        gl_FragColor = vec4 ( 1.0, 0.0, 0.0, 1.0 );
+                                                      }");
 
-            Console.WriteLine(@"Output from calling CLR wrapper library code:");
-	        Console.WriteLine(output);
+            clrAngleTranslator.Dispose();
+            
+            Console.WriteLine(ret);
 
 	        Console.WriteLine(@"Press return to continue");
 	        Console.ReadLine();
-
-
 
         }
     }

@@ -11,17 +11,17 @@ namespace CLRAngleTranslatorWrapper {
 	public ref class CLRAngleTranslator
 	{
 	private:
-		CLRAngleTranslator();
-
-		CLRAngleTranslator(const CLRAngleTranslator%);
 		static CLRAngleTranslator ^ instance = nullptr;
+
+		CLRAngleTranslator();
+		CLRAngleTranslator(const CLRAngleTranslator%);
 
 	public:
 		static property CLRAngleTranslator^ Instance { CLRAngleTranslator^ get(); };
 
         ~CLRAngleTranslator();
 
-		String ^ DoIt( String^ input);
+		String ^ ConvertToHLSL(String ^ shader);
 
 	protected: 
         !CLRAngleTranslator();

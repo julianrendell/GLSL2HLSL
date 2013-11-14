@@ -47,10 +47,15 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CLRAngleTranslatorWrapper\CLRAngleTranslatorWrapper.vcxproj">
+      <Project>{c9b612a3-b55f-4bd4-bf67-eb7b37edadb5}</Project>
+      <Name>CLRAngleTranslatorWrapper</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy /Y $(SolutionDir)\$(ConfigurationName)\AngleTranslatorDLL.* $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
