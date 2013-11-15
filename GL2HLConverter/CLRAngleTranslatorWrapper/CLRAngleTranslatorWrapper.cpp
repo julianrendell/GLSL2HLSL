@@ -2,8 +2,6 @@
 
 
 #include "stdafx.h"
-
-
 #include <vector>
 
 // marshall.h must be included first as it blindly redefines things... leading to compiler errors if it's not included first.

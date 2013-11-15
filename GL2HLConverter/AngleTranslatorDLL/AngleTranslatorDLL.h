@@ -10,7 +10,14 @@
 #define ANGLETRANSLATORDLL_API __declspec(dllimport)
 #endif
 
+#ifndef ANGLETRANSLATORDLL_H
+#define ANGLETRANSLATORDLL_H
+
+#include <stdio.h>
 #include "GLSLANG\ShaderLang.h"
+#include "libGLESv2\Shader.h"
+
+gl::AttributeArray * mAttributes;
 
 ANGLETRANSLATORDLL_API int ShaderInitialize();
 
@@ -34,3 +41,9 @@ ANGLETRANSLATORDLL_API void ShaderInitBuiltInResources(ShBuiltInResources* resou
 ANGLETRANSLATORDLL_API void ShaderGetInfo(const ShHandle handle, ShShaderInfo pname, size_t* params);
 
 ANGLETRANSLATORDLL_API void ShaderGetObjectCode(const ShHandle handle, char* objCode);
+
+ANGLETRANSLATORDLL_API void ParseAllAttributes(const char *hlsl);
+
+ANGLETRANSLATORDLL_API void ParseAllVaryings();
+
+#endif
