@@ -10,7 +10,7 @@ namespace CSharpTestExecutable
            	Console.WriteLine(@"Hello there!");
 
             var clrAngleTranslator = CLRAngleTranslator.Instance;
-            var ret = clrAngleTranslator.ConvertToHLSL(@"precision mediump float;
+            var ret = clrAngleTranslator.GetShader(@"precision mediump float;
                                                       void main()                                  
                                                       {                                            
                                                         gl_FragColor = vec4 ( 1.0, 0.0, 0.0, 1.0 );

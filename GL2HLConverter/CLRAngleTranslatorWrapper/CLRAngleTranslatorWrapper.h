@@ -22,6 +22,7 @@ namespace CLRAngleTranslatorWrapper {
         ~CLRAngleTranslator();
 
 		String ^ ConvertToHLSL(String ^ shader);
+		GLuint GetShader(String ^ shader);
 
 	protected: 
         !CLRAngleTranslator();

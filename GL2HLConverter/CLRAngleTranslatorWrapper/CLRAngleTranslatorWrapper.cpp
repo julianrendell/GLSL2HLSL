@@ -107,3 +107,11 @@ String ^ CLRAngleTranslator::ConvertToHLSL(String ^ shader)
 	return ms;
 }
 
+GLuint CLRAngleTranslator::GetShader(String ^ shader)
+{
+	IntPtr ip = Marshal::StringToHGlobalAnsi(shader);
+	const char* str = static_cast<const char*>(ip.ToPointer());
+
+	return GetHLSL(str);
+}
+

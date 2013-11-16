@@ -6,7 +6,8 @@
 #include "stdafx.h"
 #include "stdio.h"
 #include "AngleTranslatorDLL.h"
-#include "compiler\debug.h"
+//#include "compiler\debug.h"
+
 
 ANGLETRANSLATORDLL_API int ShaderInitialize()
 {
@@ -56,62 +57,78 @@ ANGLETRANSLATORDLL_API void ShaderGetObjectCode(const ShHandle handle, char* obj
 }
 
 
-GLenum parseType(const std::string &type)
+///
+// Create a shader object, load the shader source, and
+// compile the shader.
+//
+ANGLETRANSLATORDLL_API GLuint LoadShader ( GLenum type, const char *shaderSrc )
 {
-    if (type == "float")
-    {
-        return GL_FLOAT;
-    }
-    else if (type == "float2")
-    {
-        return GL_FLOAT_VEC2;
-    }
-    else if (type == "float3")
-    {
-        return GL_FLOAT_VEC3;
-    }
-    else if (type == "float4")
-    {
-        return GL_FLOAT_VEC4;
-    }
-    else if (type == "float2x2")
-    {
-        return GL_FLOAT_MAT2;
-    }
-    else if (type == "float3x3")
-    {
-        return GL_FLOAT_MAT3;
-    }
-    else if (type == "float4x4")
-    {
-        return GL_FLOAT_MAT4;
-    }
-    else UNREACHABLE();
+   GLuint shader;
+   GLint compiled;
+   
+   // Create the shader object
+   shader = glCreateShader ( type );
 
-    return GL_NONE;
+   if ( shader == 0 )
+   	return 0;
+
+   // Load the shader source
+   glShaderSource ( shader, 1, &shaderSrc, NULL );
+   
+   // Compile the shader
+   glCompileShader ( shader );
+
+   // Check the compile status
+   glGetShaderiv ( shader, GL_COMPILE_STATUS, &compiled );
+
+   if ( !compiled ) 
+   {
+      GLint infoLen = 0;
+
+      glGetShaderiv ( shader, GL_INFO_LOG_LENGTH, &infoLen );
+
+      glDeleteShader ( shader );
+      return 0;
+   }
+
+   return 0;
+
 }
 
-ANGLETRANSLATORDLL_API void ParseAllAttributes(const char *hlsl)
+ANGLETRANSLATORDLL_API GLuint GetHLSL(const char *shaderSrc)
 {
-   /* if (hlsl)
-    {
-        const char *input = strstr(hlsl, "// Attributes") + 14;
+	GLuint vertexShader;
+    GLuint fragmentShader;
+	GLuint programObject;
+	GLint linked;
 
-        while(true)
-        {
-            char attributeType[256];
-            char attributeName[256];
+	fragmentShader = LoadShader(GL_FRAGMENT_SHADER, shaderSrc);
 
-            int matches = sscanf(input, "static %255s _%255s", attributeType, attributeName);
+	// Create the program object
+    programObject = glCreateProgram ( );
+   
+    if ( programObject == 0 )
+       return 0;
 
-            if (matches != 2)
-            {
-                break;
-            }
+    glAttachShader ( programObject, fragmentShader );
 
-            mAttributes.push_back(gl::Attribute(parseType(attributeType), attributeName));
+    // Bind vPosition to attribute 0   
+    glBindAttribLocation ( programObject, 0, "vPosition" );
 
-            input = strstr(input, ";") + 2;
-        }
-    }*/
+    // Link the program
+    glLinkProgram ( programObject );
+
+    // Check the link status
+    glGetProgramiv ( programObject, GL_LINK_STATUS, &linked );
+
+	GLsizei maxCount = 1;
+	GLsizei count = 1;
+	glGetAttachedShaders(programObject, maxCount, &count, &fragmentShader);
+
+	gl::Context *context = gl::getNonLostContext();
+	gl::Shader *shader = context->getShader(fragmentShader);
+	gl::FragmentShader* mFragmentShader = (gl::FragmentShader*) shader;
+	std::string fShader = shader->getHLSL();
+
+	return 0;
 }
