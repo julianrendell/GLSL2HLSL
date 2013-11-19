@@ -9,6 +9,13 @@
 //#include "compiler\debug.h"
 
 
+//std::string str(int i)
+//{
+//    char buffer[20];
+//    snprintf(buffer, sizeof(buffer), "%d", i);
+//    return buffer;
+//}
+
 ANGLETRANSLATORDLL_API int ShaderInitialize()
 {
 	return ShInitialize();
@@ -57,78 +64,83 @@ ANGLETRANSLATORDLL_API void ShaderGetObjectCode(const ShHandle handle, char* obj
 }
 
 
-///
-// Create a shader object, load the shader source, and
-// compile the shader.
+
+
+
+/////
+//// Create a shader object, load the shader source, and
+//// compile the shader.
+////
+//ANGLETRANSLATORDLL_API GLuint LoadShader ( GLenum type, const char *shaderSrc )
+//{
+//   GLuint shader;
+//   GLint compiled;
+//   
+//   // Create the shader object
+//   shader = glCreateShader ( type );
 //
-ANGLETRANSLATORDLL_API GLuint LoadShader ( GLenum type, const char *shaderSrc )
-{
-   GLuint shader;
-   GLint compiled;
-   
-   // Create the shader object
-   shader = glCreateShader ( type );
-
-   if ( shader == 0 )
-   	return 0;
-
-   // Load the shader source
-   glShaderSource ( shader, 1, &shaderSrc, NULL );
-   
-   // Compile the shader
-   glCompileShader ( shader );
-
-   // Check the compile status
-   glGetShaderiv ( shader, GL_COMPILE_STATUS, &compiled );
-
-   if ( !compiled ) 
-   {
-      GLint infoLen = 0;
-
-      glGetShaderiv ( shader, GL_INFO_LOG_LENGTH, &infoLen );
-
-      glDeleteShader ( shader );
-      return 0;
-   }
-
-   return 0;
-
-}
-
-ANGLETRANSLATORDLL_API GLuint GetHLSL(const char *shaderSrc)
-{
-	GLuint vertexShader;
-    GLuint fragmentShader;
-	GLuint programObject;
-	GLint linked;
-
-	fragmentShader = LoadShader(GL_FRAGMENT_SHADER, shaderSrc);
-
-	// Create the program object
-    programObject = glCreateProgram ( );
-   
-    if ( programObject == 0 )
-       return 0;
-
-    glAttachShader ( programObject, fragmentShader );
-
-    // Bind vPosition to attribute 0   
-    glBindAttribLocation ( programObject, 0, "vPosition" );
-
-    // Link the program
-    glLinkProgram ( programObject );
-
-    // Check the link status
-    glGetProgramiv ( programObject, GL_LINK_STATUS, &linked );
-
-	GLsizei maxCount = 1;
-	GLsizei count = 1;
-	glGetAttachedShaders(programObject, maxCount, &count, &fragmentShader);
-
-	gl::Context *context = gl::getNonLostContext();
-	gl::Shader *shader = context->getShader(fragmentShader);
-	gl::FragmentShader* mFragmentShader = (gl::FragmentShader*) shader;
-	std::string fShader = shader->getHLSL();
-
-	return 0;
-}
+//   if ( shader == 0 )
+//   	return 0;
+//
+//   // Load the shader source
+//   glShaderSource ( shader, 1, &shaderSrc, NULL );
+//   
+//   // Compile the shader
+//   glCompileShader ( shader );
+//
+//   // Check the compile status
+//   glGetShaderiv ( shader, GL_COMPILE_STATUS, &compiled );
+//
+//   if ( !compiled ) 
+//   {
+//      GLint infoLen = 0;
+//
+//      glGetShaderiv ( shader, GL_INFO_LOG_LENGTH, &infoLen );
+//
+//      glDeleteShader ( shader );
+//      return 0;
+//   }
+//
+//   return shader;
+//}
+//
+//ANGLETRANSLATORDLL_API GLuint GetHLSL(const char *shaderSrc)
+//{
+//	GLuint vertexShader;
+//    GLuint fragmentShader;
+//	GLuint programObject;
+//	GLint linked;
+//
+//	fragmentShader = LoadShader(GL_FRAGMENT_SHADER, shaderSrc);
+//
+//	// Create the program object
+//    programObject = glCreateProgram ( );
+//   
+//    if ( programObject == 0 )
+//       return 0;
+//
+//    glAttachShader ( programObject, fragmentShader );
+//
+//    // Bind vPosition to attribute 0   
+//    glBindAttribLocation ( programObject, 0, "vPosition" );
+//
+//    // Link the program
+//    glLinkProgram ( programObject );
+//
+//    // Check the link status
+//    glGetProgramiv ( programObject, GL_LINK_STATUS, &linked );
+//
+//	GLsizei maxCount = 1;
+//	GLsizei count = 1;
+//	glGetAttachedShaders(programObject, maxCount, &count, &fragmentShader);
+//
+//	//gl::Context *context = gl::getNonLostContext();
+//	//gl::Shader *shader = context->getShader(fragmentShader);
+//
+//	gl::ResourceManager *mResourceManager = new ResourceManager(NULL);
+//	gl::Shader *shader = mResourceManager->getShader(fragmentShader);
+//	gl::FragmentShader* mFragmentShader = (gl::FragmentShader*) shader;
+//	std::string fShader = mFragmentShader->getHLSL();
+//
+//	return 0;
+//}

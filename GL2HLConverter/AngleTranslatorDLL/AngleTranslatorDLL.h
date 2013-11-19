@@ -21,6 +21,8 @@
 #include "libGLESv2\Program.h"
 #include "libGLESv2\Context.h"
 #include "libGLESv2\main.h"
+#include "libGLESv2\Program.h"
+//#include "libGLESv2\ResourceManager.h"
 
 ANGLETRANSLATORDLL_API int ShaderInitialize();
 
@@ -52,5 +54,11 @@ ANGLETRANSLATORDLL_API void ParseAllVaryings();
 ANGLETRANSLATORDLL_API GLuint LoadShader(GLenum type, const char *shaderSrc);
 
 ANGLETRANSLATORDLL_API GLuint GetHLSL(const char *shaderSrc);
+
+ANGLETRANSLATORDLL_API bool linkVaryings(gl::InfoLog &infoLog, int registers, const gl::Varying *packing[][4],
+                      std::string& pixelHLSL, std::string& vertexHLSL,
+                      gl::FragmentShader *fragmentShader, gl::VertexShader *vertexShader);
+
+ANGLETRANSLATORDLL_API bool link(gl::InfoLog &infoLog, const gl::AttributeBindings &attributeBindings, gl::FragmentShader *fragmentShader, gl::VertexShader *vertexShader);
 
 #endif
