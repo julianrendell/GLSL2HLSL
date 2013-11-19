@@ -1,6 +1,5 @@
 #include "Monolith.h"
 
-// Refactoring incomplete!
 void CompileShader(void * compiler, const char * shaderSrc)
 {
 	int result = ShCompile(compiler, &shaderSrc, 1, SH_OBJECT_CODE);
@@ -72,7 +71,12 @@ void Humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc)
 
 	ConstructCompiler(resources);
 	CompileShader(fragmentCompiler, fragmentShaderSrc);
+	
+	// ...
+
 	CompileShader(vertexCompiler, vertexShaderSrc);
+
+	// ...
 };
 
 
