@@ -1,7 +1,11 @@
 #define GL_NONE                           0 // Copied from gl2.h
+#define	D3D11_VS_OUTPUT_REGISTER_COUNT	( 32 )
+#define	D3D11_SHADER_MAJOR_VERSION	( 5 )
+#define	D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT	( 8 )
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <stdio.h>
 #include <string>
 #include <list>
 #include <vector>
@@ -93,6 +97,7 @@ class Shader
 {
 public:
 	void parseVaryings();
+	void resetVaryingsRegisterAssignment();
 
 	bool mUsesMultipleRenderTargets;
     bool mUsesFragColor;
@@ -131,11 +136,34 @@ class FragmentShader : public Shader
 VertexShader *vShader;
 FragmentShader *fShader;
 
+class InfoLog
+{
+  public:
+    InfoLog();
+    ~InfoLog();
+
+    int getLength() const;
+    void getLog(GLsizei bufSize, GLsizei *length, char *infoLog);
+
+    void appendSanitized(const char *message);
+    void append(const char *info, ...);
+    void reset();
+
+    char *mInfoLog;
+};
+
 //FUNCTIONS================================================================================================================
+
+std::string decorateAttribute(const std::string &name);
 
 void linkUniforms();
 void linkAttributes();
-void linkVaryings();
+bool linkVaryings(int registers, const Varying *packing[][4],
+                                 std::string& pixelHLSL, std::string& vertexHLSL,
+                                 FragmentShader *fragmentShader, VertexShader *vertexShader);
+int VariableColumnCount(GLenum type);
+int VariableRowCount(GLenum type);
+int packVaryings(const Varying *packing[][4], FragmentShader *fragmentShader);
 bool link();
 
 void bindAttributeLocation(GLuint index, const GLchar* name);
