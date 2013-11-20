@@ -87,54 +87,69 @@ typedef std::vector<Uniform> ActiveUniforms;
 
 std::set<std::string> attributeBinding[MAX_VERTEX_ATTRIBS];
 
-//FLAGS & PLACEHOLDERS================================================================================================================
+//SHADER CLASSES================================================================================================================
 
-bool usesMultipleRenderTargets;
-bool usesFragColor;
-bool usesFragData;
-bool usesFragCoord;
-bool usesFrontFacing;
-bool usesPointSize;
-bool usesPointCoord;
-bool usesDepthRange;
-bool usesFragDepth;
-bool usesDiscardRewriting;
+class Shader
+{
+public:
+	void parseVaryings();
 
-static void *fragmentCompiler;
-static void *vertexCompiler;
+	bool mUsesMultipleRenderTargets;
+    bool mUsesFragColor;
+    bool mUsesFragData;
+    bool mUsesFragCoord;
+    bool mUsesFrontFacing;
+    bool mUsesPointSize;
+    bool mUsesPointCoord;
+    bool mUsesDepthRange;
+    bool mUsesFragDepth;
+    bool mUsesDiscardRewriting;
 
-char *fragmentHLSL = NULL;
-char *vertexHLSL = NULL;
+	VaryingList mVaryings;
 
-char *fragmentInfoLog = NULL;
-char *vertexInfoLog = NULL;
+	char *mSource;
+    char *mHlsl;
+    char *mInfoLog;
 
-VaryingList varyings;
-AttributeArray attributes;
-ActiveUniforms activeUniforms;
+	void *compiler;
+
+	ActiveUniforms mActiveUniforms;
+};
+
+class VertexShader : public Shader
+{
+  public:
+    void parseAttributes();
+
+    AttributeArray mAttributes;
+};
+
+class FragmentShader : public Shader
+{
+};
+
+VertexShader *vShader;
+FragmentShader *fShader;
 
 //FUNCTIONS================================================================================================================
 
-void LinkUniforms();
-void LinkAttributes();
-void LinkVaryings();
-bool Link();
+void linkUniforms();
+void linkAttributes();
+void linkVaryings();
+bool link();
 
-void BindAttributeLocation(GLuint index, const GLchar* name);
+void bindAttributeLocation(GLuint index, const GLchar* name);
+bool compareVarying(const Varying &x, const Varying &y);
+bool isCompiled(char * hlsl);
+GLenum parseType(const std::string &type);
 
-bool CompareVarying(const Varying &x, const Varying &y);
+void compileToHLSL(Shader *shader);
 
-bool IsCompiled(char * hlsl);
-GLenum ParseType(const std::string &type);
-void ParseAttributes(char * hlsl);
-void ParseVaryings(char * hlsl);
-void CompileToHLSL(void * compiler, const char * shaderSrc, char * hlsl, char * infoLog);
+void compileVertexShader(VertexShader *vShader);
+void compileFragmentShader(FragmentShader *fShader);
 
-void CompileFragmentShader();
-void CompileVertexShader();
-
-void ConstructCompiler(ShBuiltInResources resources);
-ShBuiltInResources InitBuiltInResources(); 
-void Humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc);
+void constructCompiler(ShBuiltInResources resources);
+ShBuiltInResources initBuiltInResources(); 
+void humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc);
 	
 

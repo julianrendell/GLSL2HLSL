@@ -1,30 +1,26 @@
 #include "Monolith.h"
 
-void LinkUniforms()
+void linkUniforms()
 {
 
 }
 
-void LinkAttributes()
+void linkAttributes()
 {
 
 }
 
-void LinkVaryings()
+void linkVaryings()
 {
 
 }
 
-bool Link()
+bool link()
 {
-	// Map the varyings to the register file
-    const Varying *packing[IMPLEMENTATION_MAX_VARYING_VECTORS][4] = {NULL};
-    int registers = packVaryings(infoLog, packing, fragmentShader);
-
 	return false;
 }
 
-void BindAttributeLocation(GLuint index, const GLchar* name)
+void bindAttributeLocation(GLuint index, const GLchar* name)
 {
 	if (index >= MAX_VERTEX_ATTRIBS)
     {
@@ -49,7 +45,7 @@ void BindAttributeLocation(GLuint index, const GLchar* name)
 
 // This is taken from Shader.cpp
 // true if varying x has a higher priority in packing than y
-bool CompareVarying(const Varying &x, const Varying &y)
+bool compareVarying(const Varying &x, const Varying &y)
 {
     if(x.type == y.type)
     {
@@ -136,7 +132,7 @@ bool IsCompiled(char * hlsl)
 	return hlsl != NULL;
 }
 
-GLenum ParseType(const std::string &type)
+GLenum parseType(const std::string &type)
 {
     if (type == "float")
     {
@@ -172,11 +168,11 @@ GLenum ParseType(const std::string &type)
 	}
 }
 
-void ParseAttributes(char * hlsl)
+void VertexShader::parseAttributes()
 {
-    if (hlsl)
+	if (mHlsl)
     {
-        const char *input = strstr(hlsl, "// Attributes") + 14;
+		const char *input = strstr(mHlsl, "// Attributes") + 14;
 
         while(true)
         {
@@ -190,18 +186,18 @@ void ParseAttributes(char * hlsl)
                 break;
             }
 
-            attributes.push_back(Attribute(ParseType(attributeType), attributeName));
+			mAttributes.push_back(Attribute(parseType(attributeType), attributeName));
 
             input = strstr(input, ";") + 2;
         }
     }
 }
 
-void ParseVaryings(char * hlsl)
+void Shader::parseVaryings()
 {
-	if (hlsl)
+	if (mHlsl)
     {
-        const char *input = strstr(vertexHLSL, "// Varyings") + 12;
+		const char *input = strstr(mHlsl, "// Varyings") + 12;
 
         while(true)
         {
@@ -224,92 +220,92 @@ void ParseVaryings(char * hlsl)
                 *array = '\0';
             }
 
-			varyings.push_back(Varying(ParseType(varyingType), varyingName, size, array != NULL));
+			mVaryings.push_back(Varying(parseType(varyingType), varyingName, size, array != NULL));
 
             input = strstr(input, ";") + 2;
         }
 
-        usesMultipleRenderTargets = strstr(hlsl, "GL_USES_MRT") != NULL;
-        usesFragColor = strstr(hlsl, "GL_USES_FRAG_COLOR") != NULL;
-        usesFragData = strstr(hlsl, "GL_USES_FRAG_DATA") != NULL;
-        usesFragCoord = strstr(hlsl, "GL_USES_FRAG_COORD") != NULL;
-        usesFrontFacing = strstr(hlsl, "GL_USES_FRONT_FACING") != NULL;
-        usesPointSize = strstr(hlsl, "GL_USES_POINT_SIZE") != NULL;
-        usesPointCoord = strstr(hlsl, "GL_USES_POINT_COORD") != NULL;
-        usesDepthRange = strstr(hlsl, "GL_USES_DEPTH_RANGE") != NULL;
-        usesFragDepth = strstr(hlsl, "GL_USES_FRAG_DEPTH") != NULL;
-        usesDiscardRewriting = strstr(hlsl, "ANGLE_USES_DISCARD_REWRITING") != NULL;
+		mUsesMultipleRenderTargets = strstr(mHlsl, "GL_USES_MRT") != NULL;
+        mUsesFragColor = strstr(mHlsl, "GL_USES_FRAG_COLOR") != NULL;
+        mUsesFragData = strstr(mHlsl, "GL_USES_FRAG_DATA") != NULL;
+        mUsesFragCoord = strstr(mHlsl, "GL_USES_FRAG_COORD") != NULL;
+        mUsesFrontFacing = strstr(mHlsl, "GL_USES_FRONT_FACING") != NULL;
+        mUsesPointSize = strstr(mHlsl, "GL_USES_POINT_SIZE") != NULL;
+        mUsesPointCoord = strstr(mHlsl, "GL_USES_POINT_COORD") != NULL;
+        mUsesDepthRange = strstr(mHlsl, "GL_USES_DEPTH_RANGE") != NULL;
+        mUsesFragDepth = strstr(mHlsl, "GL_USES_FRAG_DEPTH") != NULL;
+        mUsesDiscardRewriting = strstr(mHlsl, "ANGLE_USES_DISCARD_REWRITING") != NULL;
     }
 }
 
-void CompileToHLSL(void * compiler, const char * shaderSrc, char * hlsl, char * infoLog)
+void compileToHLSL(Shader *shader)
 {
-	int result = ShCompile(compiler, &shaderSrc, 1, SH_OBJECT_CODE);
+	int result = ShCompile(shader->compiler, &shader->mSource, 1, SH_OBJECT_CODE);
 
 	if (result)
     {
         size_t objCodeLen = 0;
-        ShGetInfo(compiler, SH_OBJECT_CODE_LENGTH, &objCodeLen);
-		hlsl = new char[objCodeLen];
-        ShGetObjectCode(compiler, hlsl);
+		ShGetInfo(shader->compiler, SH_OBJECT_CODE_LENGTH, &objCodeLen);
+		shader->mHlsl = new char[objCodeLen];
+		ShGetObjectCode(shader->compiler, shader->mHlsl);
 
         void *activeUniforms;
-        ShGetInfoPointer(compiler, SH_ACTIVE_UNIFORMS_ARRAY, &activeUniforms);
+		ShGetInfoPointer(shader->compiler, SH_ACTIVE_UNIFORMS_ARRAY, &activeUniforms);
         activeUniforms = (ActiveUniforms*)activeUniforms;
     }
     else
     {
         size_t infoLogLen = 0;
-        ShGetInfo(compiler, SH_INFO_LOG_LENGTH, &infoLogLen);
-		infoLog = new char[infoLogLen];
-        ShGetInfoLog(compiler, infoLog);
+		ShGetInfo(shader->compiler, SH_INFO_LOG_LENGTH, &infoLogLen);
+		shader->mInfoLog = new char[infoLogLen];
+		ShGetInfoLog(shader->compiler, shader->mInfoLog);
 
-		throw new std::runtime_error(infoLog);
+		throw new std::runtime_error(shader->mInfoLog);
     }
 }
 
-void CompileVertexShader(const char * vertexShaderSrc)
+void compileVertexShader(VertexShader *vShader)
 {
-	CompileToHLSL(vertexCompiler, vertexShaderSrc, vertexHLSL, vertexInfoLog);
+	compileToHLSL(vShader);
 
-	if (!IsCompiled(vertexHLSL))
+	if (!IsCompiled(vShader->mHlsl))
 	{
 		throw new std::runtime_error("Vertex shader compilation has failed! (HLSL string is empty)");
 	}
 
-	ParseAttributes(vertexHLSL);
-	ParseVaryings(vertexHLSL);
+	vShader->parseAttributes();
+	vShader->parseVaryings();
 }
 
-void CompileFragmentShader(const char * fragmentShaderSrc)
+void compileFragmentShader(FragmentShader *fShader)
 {
-	CompileToHLSL(fragmentCompiler, fragmentShaderSrc, fragmentHLSL, fragmentInfoLog);
+	compileToHLSL(fShader);
 
-	if (!IsCompiled(fragmentHLSL))
+	if (!IsCompiled(fShader->mHlsl))
 	{
 		throw new std::runtime_error("Fragment shader compilation has failed! (HLSL string is empty)");
 	}
 
-	ParseVaryings(fragmentHLSL);
-	varyings.sort(CompareVarying);
+	fShader->parseVaryings();
+	fShader->mVaryings.sort(compareVarying);
 }
 
-void ConstructCompiler(ShBuiltInResources resources)
+void constructCompiler(ShBuiltInResources resources)
 {
-	fragmentCompiler = ShConstructCompiler(SH_FRAGMENT_SHADER, SH_GLES2_SPEC, SH_HLSL11_OUTPUT, &resources);
-	if (NULL == fragmentCompiler)
+	fShader->compiler = ShConstructCompiler(SH_FRAGMENT_SHADER, SH_GLES2_SPEC, SH_HLSL11_OUTPUT, &resources);
+	if (NULL == fShader->compiler)
 	{
 		throw new std::runtime_error("Fragment compiler construction failed!");
 	}
 
-	vertexCompiler = ShConstructCompiler(SH_VERTEX_SHADER, SH_GLES2_SPEC, SH_HLSL11_OUTPUT, &resources);
-	if (NULL == vertexCompiler)
+	vShader->compiler = ShConstructCompiler(SH_VERTEX_SHADER, SH_GLES2_SPEC, SH_HLSL11_OUTPUT, &resources);
+	if (NULL == vShader->compiler)
 	{
 		throw new std::runtime_error("Vertex compiler construction failed!");
 	}
 }
 
-ShBuiltInResources InitBuiltInResources()
+ShBuiltInResources initBuiltInResources()
 {
 	ShBuiltInResources resources;
 
@@ -333,17 +329,23 @@ ShBuiltInResources InitBuiltInResources()
 	return resources;
 }
 
-void Humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc)
+void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc)
 {
-	ShBuiltInResources resources = InitBuiltInResources();
-	ConstructCompiler(resources);
+	vShader = new VertexShader();
+	vShader->mSource = (char*) vertexShaderSrc;
 
-	CompileVertexShader(vertexShaderSrc);
-	CompileFragmentShader(fragmentShaderSrc);
+	fShader = new FragmentShader();
+	fShader->mSource = (char*) fragmentShaderSrc;
+
+	ShBuiltInResources resources = initBuiltInResources();
+	constructCompiler(resources);
+
+	compileVertexShader(vShader);
+	compileFragmentShader(fShader);
 	
-	BindAttributeLocation(0, "vPosition");
+	bindAttributeLocation(0, "vPosition");
 
-	Link();
+	link();
 };
 
 
