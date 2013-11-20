@@ -1,13 +1,33 @@
 #define GL_NONE                           0 // Copied from gl2.h
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <string>
 #include <list>
 #include <vector>
+#include <set>
 #include <stdexcept>
 
 #include "GLSLANG\ShaderLang.h"
+#include "GLES2\gl2.h"
+
+//STRUCTS & ENUMS================================================================================================================
 
 typedef unsigned int     GLenum; // Copied from gl2.h
+
+// Enum taken from constants.h
+enum
+{
+    MAX_VERTEX_ATTRIBS = 16,
+    MAX_TEXTURE_IMAGE_UNITS = 16,
+
+    // Implementation upper limits, real maximums depend on the hardware
+    IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS = 16,
+    IMPLEMENTATION_MAX_COMBINED_TEXTURE_IMAGE_UNITS = MAX_TEXTURE_IMAGE_UNITS + IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS,    
+
+    IMPLEMENTATION_MAX_VARYING_VECTORS = 32,
+    IMPLEMENTATION_MAX_DRAW_BUFFERS = 8
+};
 
 // Copied from Shader.h
 struct Varying
@@ -46,6 +66,7 @@ struct Attribute
 
 typedef std::vector<Attribute> AttributeArray;
 
+
 // Copied from Uniform.h
 struct Uniform
 {
@@ -64,9 +85,9 @@ struct Uniform
 
 typedef std::vector<Uniform> ActiveUniforms;
 
+std::set<std::string> attributeBinding[MAX_VERTEX_ATTRIBS];
 
-//================================================================================================================
-VaryingList varyings;
+//FLAGS & PLACEHOLDERS================================================================================================================
 
 bool usesMultipleRenderTargets;
 bool usesFragColor;
@@ -82,17 +103,38 @@ bool usesDiscardRewriting;
 static void *fragmentCompiler;
 static void *vertexCompiler;
 
-char *hlsl;
-char *infoLog;
+char *fragmentHLSL = NULL;
+char *vertexHLSL = NULL;
+
+char *fragmentInfoLog = NULL;
+char *vertexInfoLog = NULL;
+
+VaryingList varyings;
+AttributeArray attributes;
 ActiveUniforms activeUniforms;
-//================================================================================================================
 
+//FUNCTIONS================================================================================================================
 
+void LinkUniforms();
+void LinkAttributes();
+void LinkVaryings();
+bool Link();
 
-// FUNCTIONS
-void CompileShader(void * compiler, const char * shaderSrc);
+void BindAttributeLocation(GLuint index, const GLchar* name);
+
+bool CompareVarying(const Varying &x, const Varying &y);
+
+bool IsCompiled(char * hlsl);
+GLenum ParseType(const std::string &type);
+void ParseAttributes(char * hlsl);
+void ParseVaryings(char * hlsl);
+void CompileToHLSL(void * compiler, const char * shaderSrc, char * hlsl, char * infoLog);
+
+void CompileFragmentShader();
+void CompileVertexShader();
+
 void ConstructCompiler(ShBuiltInResources resources);
 ShBuiltInResources InitBuiltInResources(); 
 void Humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc);
-
+	
 
