@@ -107,11 +107,17 @@ String ^ CLRAngleTranslator::ConvertToHLSL(String ^ shader)
 	return ms;
 }
 
-GLuint CLRAngleTranslator::GetShader(String ^ shader)
+void CLRAngleTranslator::GetShader(String ^ vShader, String ^ fShader)
 {
-	IntPtr ip = Marshal::StringToHGlobalAnsi(shader);
-	const char* str = static_cast<const char*>(ip.ToPointer());
+	IntPtr fip = Marshal::StringToHGlobalAnsi(vShader);
+	const char* vSrc = static_cast<const char*>(fip.ToPointer());
 
-	return GetHLSL(str);
+	IntPtr vip = Marshal::StringToHGlobalAnsi(fShader);
+	const char* fSrc = static_cast<const char*>(vip.ToPointer());
+	
+	humongoid(vSrc, fSrc);
+	
+	Marshal::FreeHGlobal(fip);
+	Marshal::FreeHGlobal(vip);
 }
 

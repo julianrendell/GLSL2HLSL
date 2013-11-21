@@ -22,14 +22,303 @@ std::string decorateAttribute(const std::string &name)
     return name;
 }
 
-void linkUniforms()
+GLint getUniformLocation(std::string name)
 {
+    unsigned int subscript = 0;
 
+    // Strip any trailing array operator and retrieve the subscript
+    size_t open = name.find_last_of('[');
+    size_t close = name.find_last_of(']');
+    if (open != std::string::npos && close == name.length() - 1)
+    {
+        subscript = atoi(name.substr(open + 1).c_str());
+        name.erase(open);
+    }
+
+    unsigned int numUniforms = mUniformIndex.size();
+    for (unsigned int location = 0; location < numUniforms; location++)
+    {
+        if (mUniformIndex[location].name == name &&
+            mUniformIndex[location].element == subscript)
+        {
+            return location;
+        }
+    }
+
+    return -1;
 }
 
-void linkAttributes()
+unsigned int Uniform::elementCount() const
 {
+    return arraySize > 0 ? arraySize : 1;
+}
 
+bool defineUniform(GLenum shader, const Uniform &constant)
+{
+    if (constant.type == GL_SAMPLER_2D ||
+        constant.type == GL_SAMPLER_CUBE)
+    {
+        unsigned int samplerIndex = constant.registerIndex;
+            
+        do
+        {
+            if (shader == GL_VERTEX_SHADER)
+            {
+                if (samplerIndex < MAX_TEXTURE_IMAGE_UNITS_VTF_SN4)
+                {
+                    mSamplersVS[samplerIndex].active = true;
+                    mSamplersVS[samplerIndex].textureType = (constant.type == GL_SAMPLER_CUBE) ? TEXTURE_CUBE : TEXTURE_2D;
+                    mSamplersVS[samplerIndex].logicalTextureUnit = 0;
+                    mUsedVertexSamplerRange = std::max(samplerIndex + 1, mUsedVertexSamplerRange);
+                }
+                else
+                {
+					std::string msg = std::string("Vertex shader sampler count exceeds the maximum vertex texture units (") + str(MAX_TEXTURE_IMAGE_UNITS_VTF_SN4) + ")";
+
+					throw new std::runtime_error(msg.c_str());
+                }
+            }
+            else if (shader == GL_FRAGMENT_SHADER)
+            {
+                if (samplerIndex < MAX_TEXTURE_IMAGE_UNITS)
+                {
+                    mSamplersPS[samplerIndex].active = true;
+                    mSamplersPS[samplerIndex].textureType = (constant.type == GL_SAMPLER_CUBE) ? TEXTURE_CUBE : TEXTURE_2D;
+                    mSamplersPS[samplerIndex].logicalTextureUnit = 0;
+                    mUsedPixelSamplerRange = std::max(samplerIndex + 1, mUsedPixelSamplerRange);
+                }
+                else
+                {
+					std::string msg = std::string("Pixel shader sampler count exceeds MAX_TEXTURE_IMAGE_UNITS (") + str(MAX_TEXTURE_IMAGE_UNITS_VTF_SN4) + ")";
+
+					throw new std::runtime_error(msg.c_str());
+                }
+            }
+			else throw new std::runtime_error("Unidentified shader object");
+
+            samplerIndex++;
+        }
+        while (samplerIndex < constant.registerIndex + constant.arraySize);
+    }
+
+    Uniform *uniform = NULL;
+    GLint location = getUniformLocation(constant.name);
+
+    if (location >= 0)   // Previously defined, type and precision must match
+    {
+        uniform = mUniforms[mUniformIndex[location].index];
+
+        if (uniform->type != constant.type)
+        {
+			std::string msg = std::string("Types for uniform ") + uniform->name + " do not match between the vertex and fragment shader";
+
+			throw new std::runtime_error(msg);
+        }
+
+        if (uniform->precision != constant.precision)
+        {
+			std::string msg = std::string("Precisions for uniform ") + uniform->name + " do not match between the vertex and fragment shader";
+
+			throw new std::runtime_error(msg);
+        }
+    }
+    else
+    {
+        uniform = new Uniform(constant.type, constant.precision, constant.name, constant.arraySize);
+    }
+
+    if (!uniform)
+    {
+        return false;
+    }
+
+    if (shader == GL_FRAGMENT_SHADER)
+    {
+        uniform->psRegisterIndex = constant.registerIndex;
+    }
+    else if (shader == GL_VERTEX_SHADER)
+    {
+        uniform->vsRegisterIndex = constant.registerIndex;
+    }
+	else throw new std::runtime_error("Unidentified shader object");
+
+    if (location >= 0)
+    {
+        return uniform->type == constant.type;
+    }
+
+    mUniforms.push_back(uniform);
+    unsigned int uniformIndex = mUniforms.size() - 1;
+
+    for (unsigned int i = 0; i < uniform->elementCount(); i++)
+    {
+        mUniformIndex.push_back(UniformLocation(constant.name, i, uniformIndex));
+    }
+
+    if (shader == GL_VERTEX_SHADER)
+    {
+        if (constant.registerIndex + uniform->registerCount > 0 + MAX_VERTEX_UNIFORM_VECTORS_D3D11)
+        {
+			std::string msg = std::string("Vertex shader active uniforms exceed GL_MAX_VERTEX_UNIFORM_VECTORS (") + str(MAX_VERTEX_UNIFORM_VECTORS_D3D11) + ")";
+
+			throw new std::runtime_error(msg.c_str());
+        }
+    }
+    else if (shader == GL_FRAGMENT_SHADER)
+    {
+        if (constant.registerIndex + uniform->registerCount > 0 + MAX_VERTEX_UNIFORM_VECTORS_D3D11)
+        {
+			std::string msg = std::string("Fragment shader active uniforms exceed GL_MAX_FRAGMENT_UNIFORM_VECTORS (") + str(MAX_FRAGMENT_UNIFORM_VECTORS_D3D11) + ")";
+
+			throw new std::runtime_error(msg.c_str());
+        }
+    }
+    else throw new std::runtime_error("Unidentified shader object");
+
+    return true;
+}
+
+bool linkUniforms(ActiveUniforms vertexUniforms, ActiveUniforms fragmentUniforms)
+{
+	for (ActiveUniforms::const_iterator uniform = vertexUniforms.begin(); uniform != vertexUniforms.end(); uniform++)
+    {
+        if (!defineUniform(GL_VERTEX_SHADER, *uniform))
+        {
+            return false;
+        }
+    }
+
+    for (ActiveUniforms::const_iterator uniform = fragmentUniforms.begin(); uniform != fragmentUniforms.end(); uniform++)
+    {
+        if (!defineUniform(GL_FRAGMENT_SHADER, *uniform))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void initAttributesByLayout()
+{
+    for (int i = 0; i < MAX_VERTEX_ATTRIBS; i++)
+    {
+        mAttributesByLayout[i] = i;
+    }
+
+    std::sort(&mAttributesByLayout[0], &mAttributesByLayout[MAX_VERTEX_ATTRIBS], AttributeSorter(mSemanticIndex));
+}
+
+int VertexShader::getSemanticIndex(const std::string &attributeName)
+{
+    if (!attributeName.empty())
+    {
+        int semanticIndex = 0;
+        for (AttributeArray::iterator attribute = mAttributes.begin(); attribute != mAttributes.end(); attribute++)
+        {
+            if (attribute->name == attributeName)
+            {
+                return semanticIndex;
+            }
+
+            semanticIndex += VariableRowCount(attribute->type);
+        }
+    }
+
+    return -1;
+}
+
+// This method came from utilities.cpp
+int AllocateFirstFreeBits(unsigned int *bits, unsigned int allocationSize, unsigned int bitsSize)
+{
+    if (allocationSize <= bitsSize)
+	{
+		throw new std::runtime_error("Allocation size is greater than bits size");
+	}
+
+    unsigned int mask = std::numeric_limits<unsigned int>::max() >> (std::numeric_limits<unsigned int>::digits - allocationSize);
+
+    for (unsigned int i = 0; i < bitsSize - allocationSize + 1; i++)
+    {
+        if ((*bits & mask) == 0)
+        {
+            *bits |= mask;
+            return i;
+        }
+
+        mask <<= 1;
+    }
+
+    return -1;
+}
+
+bool linkAttributes(const AttributeBindings &attributeBindings, FragmentShader *fragmentShader, VertexShader *vertexShader)
+{
+	unsigned int usedLocations = 0;
+
+    // Link attributes that have a binding location
+    for (AttributeArray::iterator attribute = vertexShader->mAttributes.begin(); attribute != vertexShader->mAttributes.end(); attribute++)
+    {
+        int location = attributeBindings.getAttributeBinding(attribute->name);
+
+        if (location != -1)   // Set by glBindAttribLocation
+        {
+            if (!mLinkedAttribute[location].name.empty())
+            {
+                // Multiple active attributes bound to the same location; not an error
+            }
+
+            mLinkedAttribute[location] = *attribute;
+
+            int rows = VariableRowCount(attribute->type);
+
+            if (rows + location > MAX_VERTEX_ATTRIBS)
+            {
+				std::string msg = std::string("Active attribute ") + attribute->name +  "is too big to fit";
+				throw std::runtime_error(msg.c_str());
+            }
+
+            for (int i = 0; i < rows; i++)
+            {
+                usedLocations |= 1 << (location + i);
+            }
+        }
+    }
+
+    // Link attributes that don't have a binding location
+    for (AttributeArray::iterator attribute = vertexShader->mAttributes.begin(); attribute != vertexShader->mAttributes.end(); attribute++)
+    {
+        int location = attributeBindings.getAttributeBinding(attribute->name);
+
+        if (location == -1)   // Not set by glBindAttribLocation
+        {
+            int rows = VariableRowCount(attribute->type);
+            int availableIndex = AllocateFirstFreeBits(&usedLocations, rows, MAX_VERTEX_ATTRIBS);
+
+            if (availableIndex == -1 || availableIndex + rows > MAX_VERTEX_ATTRIBS)
+            {
+                std::string msg = std::string("Too many active attributes (") + attribute->name +  ")";
+				throw new std::runtime_error(msg.c_str());
+            }
+
+            mLinkedAttribute[availableIndex] = *attribute;
+        }
+    }
+
+    for (int attributeIndex = 0; attributeIndex < MAX_VERTEX_ATTRIBS; )
+    {
+        int index = vertexShader->getSemanticIndex(mLinkedAttribute[attributeIndex].name);
+        int rows = std::max(VariableRowCount(mLinkedAttribute[attributeIndex].type), 1);
+
+        for (int r = 0; r < rows; r++)
+        {
+            mSemanticIndex[attributeIndex++] = index++;
+        }
+    }
+
+    initAttributesByLayout();
+
+    return true;
 }
 
 bool linkVaryings(int registers, const Varying *packing[][4],
@@ -716,7 +1005,7 @@ int packVaryings(const Varying *packing[][4], FragmentShader *fragmentShader)
     return registers;
 }
 
-bool link()
+void link()
 {
 	std::string pixelHLSL = fShader->mHlsl;
 	std::string vertexHLSL = vShader->mHlsl;
@@ -727,20 +1016,26 @@ bool link()
 
 	if (registers < 0)
     {
-        return false;
+		throw new std::runtime_error("No registers available");
     }
 
 	if (!linkVaryings(registers, packing, pixelHLSL, vertexHLSL, fShader, vShader))
     {
-        return false;
+		throw std::runtime_error("Failed to link varyings");
     }
 
-    bool success = true;
+	if (!linkAttributes(attributeBinding, fShader, vShader))
+    {
+		throw std::runtime_error("Failed to link attributes");
+    }
 
-	return false;
+	if (!linkUniforms(vShader->mActiveUniforms, fShader->mActiveUniforms))
+    {
+        throw std::runtime_error("Failed to link uniforms");
+    }
 }
 
-void bindAttributeLocation(GLuint index, const GLchar* name)
+void AttributeBindings::bindAttributeLocation(GLuint index, const char *name)
 {
 	if (index >= MAX_VERTEX_ATTRIBS)
     {
@@ -752,15 +1047,28 @@ void bindAttributeLocation(GLuint index, const GLchar* name)
 		throw new std::runtime_error("The attribute name does not start with 'gl_'");
     }
 
-	if (index < MAX_VERTEX_ATTRIBS)
+    if (index < MAX_VERTEX_ATTRIBS)
     {
         for (int i = 0; i < MAX_VERTEX_ATTRIBS; i++)
         {
-            attributeBinding[i].erase(name);
+            mAttributeBinding[i].erase(name);
         }
 
-        attributeBinding[index].insert(name);
+        mAttributeBinding[index].insert(name);
     }
+}
+
+int AttributeBindings::getAttributeBinding(const std::string &name) const
+{
+    for (int location = 0; location < MAX_VERTEX_ATTRIBS; location++)
+    {
+        if (mAttributeBinding[location].find(name) != mAttributeBinding[location].end())
+        {
+            return location;
+        }
+    }
+
+    return -1;
 }
 
 // This is taken from Shader.cpp
@@ -1063,7 +1371,8 @@ void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc)
 	compileVertexShader(vShader);
 	compileFragmentShader(fShader);
 	
-	bindAttributeLocation(0, "vPosition");
+	// Attribute binding appears to be optional (not sure) - seems to happen in linkAttributes
+	attributeBinding.bindAttributeLocation(0, "vPosition");
 
 	link();
 };

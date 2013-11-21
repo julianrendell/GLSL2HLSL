@@ -3,6 +3,8 @@
 #pragma once
 
 #include "AngleTranslatorDLL.h"
+#include "Monolith.h"
+
 using namespace System;
 using namespace System::Runtime::InteropServices; 
 
@@ -22,7 +24,7 @@ namespace CLRAngleTranslatorWrapper {
         ~CLRAngleTranslator();
 
 		String ^ ConvertToHLSL(String ^ shader);
-		GLuint GetShader(String ^ shader);
+		void GetShader(String ^ vShader, String ^ fShader);
 
 	protected: 
         !CLRAngleTranslator();

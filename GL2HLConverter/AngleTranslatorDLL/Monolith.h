@@ -11,9 +11,12 @@
 #include <vector>
 #include <set>
 #include <stdexcept>
+#include <algorithm>
 
 #include "GLSLANG\ShaderLang.h"
 #include "GLES2\gl2.h"
+
+#include "AngleTranslatorDLL.h"
 
 //STRUCTS & ENUMS================================================================================================================
 
@@ -24,13 +27,27 @@ enum
 {
     MAX_VERTEX_ATTRIBS = 16,
     MAX_TEXTURE_IMAGE_UNITS = 16,
+	MAX_TEXTURE_IMAGE_UNITS_VTF_SN4 = 16,
 
     // Implementation upper limits, real maximums depend on the hardware
     IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS = 16,
     IMPLEMENTATION_MAX_COMBINED_TEXTURE_IMAGE_UNITS = MAX_TEXTURE_IMAGE_UNITS + IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS,    
 
     IMPLEMENTATION_MAX_VARYING_VECTORS = 32,
-    IMPLEMENTATION_MAX_DRAW_BUFFERS = 8
+    IMPLEMENTATION_MAX_DRAW_BUFFERS = 8,
+
+	MAX_VERTEX_UNIFORM_VECTORS_D3D11 = 1024,
+    MAX_FRAGMENT_UNIFORM_VECTORS_D3D11 = 1024
+};
+
+// Copied from angletypes.h
+enum TextureType
+{
+    TEXTURE_2D,
+    TEXTURE_CUBE,
+
+    TEXTURE_TYPE_COUNT,
+    TEXTURE_UNKNOWN
 };
 
 // Copied from Shader.h
@@ -70,28 +87,80 @@ struct Attribute
 
 typedef std::vector<Attribute> AttributeArray;
 
+Attribute mLinkedAttribute[MAX_VERTEX_ATTRIBS];
+int mSemanticIndex[MAX_VERTEX_ATTRIBS];
+int mAttributesByLayout[MAX_VERTEX_ATTRIBS];
+
+struct Sampler
+{
+    bool active;
+    GLint logicalTextureUnit;
+    TextureType textureType;
+};
+
+Sampler mSamplersPS[MAX_TEXTURE_IMAGE_UNITS];
+Sampler mSamplersVS[IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS];
+GLuint mUsedVertexSamplerRange;
+GLuint mUsedPixelSamplerRange;
 
 // Copied from Uniform.h
 struct Uniform
 {
-	Uniform(GLenum type, GLenum precision, const char *name, int arraySize, int registerIndex)
-		: type(type), precision(precision), name(name), arraySize(arraySize), registerIndex(registerIndex)
+	Uniform(GLenum type, GLenum precision, const std::string &name, unsigned int arraySize)
 	{
 	}
+
+	unsigned int elementCount() const;
 
     GLenum type;
     GLenum precision;
     std::string name;
     unsigned int arraySize;
     
-    int registerIndex;
+    int psRegisterIndex;
+    int vsRegisterIndex;
+
+	int registerIndex;
+
+	unsigned int registerCount;
 };
 
 typedef std::vector<Uniform> ActiveUniforms;
 
-std::set<std::string> attributeBinding[MAX_VERTEX_ATTRIBS];
+// Struct used for correlating uniforms/elements of uniform arrays to handles
+struct UniformLocation
+{
+    UniformLocation(const std::string &name, unsigned int element, unsigned int index)
+	{
+	}
 
-//SHADER CLASSES================================================================================================================
+    std::string name;
+    unsigned int element;
+    unsigned int index;
+};
+
+typedef std::vector<Uniform*> UniformArray;
+
+UniformArray mUniforms;
+typedef std::vector<UniformLocation> UniformIndex;
+UniformIndex mUniformIndex;
+
+struct AttributeSorter
+{
+    AttributeSorter(const int (&semanticIndices)[MAX_VERTEX_ATTRIBS])
+        : originalIndices(semanticIndices)
+    {
+    }
+
+    bool operator()(int a, int b)
+    {
+        return originalIndices[a] == -1 ? false : originalIndices[a] < originalIndices[b];
+    }
+
+    const int (&originalIndices)[MAX_VERTEX_ATTRIBS];
+};
+
+//CLASSES================================================================================================================
 
 class Shader
 {
@@ -125,6 +194,7 @@ class VertexShader : public Shader
 {
   public:
     void parseAttributes();
+	int getSemanticIndex(const std::string &attributeName);
 
     AttributeArray mAttributes;
 };
@@ -136,37 +206,36 @@ class FragmentShader : public Shader
 VertexShader *vShader;
 FragmentShader *fShader;
 
-class InfoLog
+
+class AttributeBindings
 {
   public:
-    InfoLog();
-    ~InfoLog();
+    void bindAttributeLocation(GLuint index, const char *name);
+    int getAttributeBinding(const std::string &name) const;
 
-    int getLength() const;
-    void getLog(GLsizei bufSize, GLsizei *length, char *infoLog);
-
-    void appendSanitized(const char *message);
-    void append(const char *info, ...);
-    void reset();
-
-    char *mInfoLog;
+    std::set<std::string> mAttributeBinding[MAX_VERTEX_ATTRIBS];
 };
+
+AttributeBindings attributeBinding;
 
 //FUNCTIONS================================================================================================================
 
+void initAttributesByLayout();
+int AllocateFirstFreeBits(unsigned int *bits, unsigned int allocationSize, unsigned int bitsSize);
 std::string decorateAttribute(const std::string &name);
+bool defineUniform(GLenum shader, const Uniform &constant);
+int getUniformLocation(std::string name);
 
-void linkUniforms();
-void linkAttributes();
+bool linkUniforms(ActiveUniforms vertexUniforms, ActiveUniforms fragmentUniforms);
+bool linkAttributes(const AttributeBindings &attributeBindings, FragmentShader *fragmentShader, VertexShader *vertexShader);
 bool linkVaryings(int registers, const Varying *packing[][4],
                                  std::string& pixelHLSL, std::string& vertexHLSL,
                                  FragmentShader *fragmentShader, VertexShader *vertexShader);
 int VariableColumnCount(GLenum type);
 int VariableRowCount(GLenum type);
 int packVaryings(const Varying *packing[][4], FragmentShader *fragmentShader);
-bool link();
+void link();
 
-void bindAttributeLocation(GLuint index, const GLchar* name);
 bool compareVarying(const Varying &x, const Varying &y);
 bool isCompiled(char * hlsl);
 GLenum parseType(const std::string &type);
@@ -178,6 +247,6 @@ void compileFragmentShader(FragmentShader *fShader);
 
 void constructCompiler(ShBuiltInResources resources);
 ShBuiltInResources initBuiltInResources(); 
-void humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc);
+ANGLETRANSLATORDLL_API void humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc);
 	
 
