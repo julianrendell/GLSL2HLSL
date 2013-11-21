@@ -1365,7 +1365,7 @@ ShBuiltInResources initBuiltInResources()
 	return resources;
 }
 
-void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc)
+void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc, char ** vertexHlsl, char ** fragmentHlsl)
 {
 	vShader = new VertexShader();
 	vShader->mSource = (char*) vertexShaderSrc;
@@ -1383,6 +1383,8 @@ void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc)
 	attributeBinding.bindAttributeLocation(0, "vPosition");
 
 	link();
+
+
 };
 
 
