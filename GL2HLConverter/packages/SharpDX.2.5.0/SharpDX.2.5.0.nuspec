@@ -13,6 +13,7 @@
     <description>Core assembly for all SharpDX assemblies.</description>
     <releaseNotes />
     <copyright>Copyright (c) 2010-2013 Alexandre Mutel</copyright>
+    <language />
     <tags>SharpDX DirectX Direct3D Multimedia MDX 3D</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Drawing" targetFramework=".NETFramework2.0, .NETFramework4.0" />

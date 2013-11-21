@@ -98,14 +98,12 @@ namespace MiniTri
             var vertexShaderSource = @"
 struct VS_IN
 {
-	float4 pos : POSITION;
-	//float4 col : COLOR;
+	float4 pos : TEXCOORD0;
 };
 
 struct PS_IN
 {
 	float4 pos : SV_POSITION;
-	//float4 col : COLOR;
 };
 
 PS_IN VS( VS_IN input )
@@ -113,7 +111,6 @@ PS_IN VS( VS_IN input )
 	PS_IN output = (PS_IN)0;
 	
 	output.pos = input.pos;
-	//output.col = input.col;
 	
 	return output;
 }";
@@ -143,16 +140,16 @@ float4 PS( PS_IN input ) : SV_Target
                 ShaderSignature.GetInputSignature(vertexShaderByteCode),
                 new[]
                     {
-                        new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                        new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 0, 0),
                         //new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0)
                     });
 
             // Instantiate Vertex buiffer from vertex data
             var vertices = Buffer.Create(device, BindFlags.VertexBuffer, new[]
                                   {
-                                      new Vector4(0.0f, 0.5f, 0.5f, 1.0f), //new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-                                      new Vector4(0.5f, -0.5f, 0.5f, 1.0f), //new Vector4(0.0f, 1.0f, 0.0f, 1.0f),
-                                      new Vector4(-0.5f, -0.5f, 0.5f, 1.0f), //new Vector4(0.0f, 0.0f, 1.0f, 1.0f)
+                                      new Vector4(0.0f, 0.5f, 0.5f, 1.0f),
+                                      new Vector4(0.5f, -0.5f, 0.5f, 1.0f),
+                                      new Vector4(-0.5f, -0.5f, 0.5f, 1.0f),
                                   });
 
             // Prepare All the stages

@@ -13,6 +13,7 @@
     <description>Assembly providing DirectX - Direct3D11, Direct3D11.1 and Effects11 managed API.</description>
     <releaseNotes />
     <copyright>Copyright (c) 2010-2013 Alexandre Mutel</copyright>
+    <language />
     <tags>SharpDX DirectX Direct3D MDX 3D Direct3D11 D3D11 Effects11</tags>
     <dependencies>
       <dependency id="SharpDX" version="2.5.0" />

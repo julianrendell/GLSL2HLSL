@@ -13,6 +13,7 @@
     <description>Assembly providing DirectX - D3DCompiler managed API.</description>
     <releaseNotes />
     <copyright>Copyright (c) 2010-2013 Alexandre Mutel</copyright>
+    <language />
     <tags>SharpDX DirectX Direct3D MDX 3D D3DCompiler HLSL fx Shaders</tags>
     <dependencies>
       <dependency id="SharpDX" version="2.5.0" />
