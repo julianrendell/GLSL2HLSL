@@ -96,42 +96,107 @@ namespace MiniTri
             //var vertexShaderByteCode = ShaderBytecode.CompileFromFile("MiniTri.fx", "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
 
             var vertexShaderSource = @"
-struct VS_IN
+// Attributes
+static float4 _vPosition = {0, 0, 0, 0};
+
+static float4 gl_Position = float4(0, 0, 0, 0);
+
+// Varyings
+
+
+;
+void gl_main()
 {
-	float4 pos : TEXCOORD0;
+{
+(gl_Position = _vPosition);
+}
+}
+;
+struct VS_INPUT
+{
+    float4 _vPosition : TEXCOORD0;
 };
 
-struct PS_IN
+struct VS_OUTPUT
 {
-	float4 pos : SV_POSITION;
+    float4 gl_Position : SV_Position;
 };
 
-PS_IN VS( VS_IN input )
+VS_OUTPUT main(VS_INPUT input)
 {
-	PS_IN output = (PS_IN)0;
-	
-	output.pos = input.pos;
-	
-	return output;
+    _vPosition = (input._vPosition);
+
+    gl_main();
+
+    VS_OUTPUT output;
+    output.gl_Position.x = gl_Position.x;
+    output.gl_Position.y = -gl_Position.y;
+    output.gl_Position.z = (gl_Position.z + gl_Position.w) * 0.5;
+    output.gl_Position.w = gl_Position.w;
+
+    return output;
 }";
 
             var pixelShaderSource = @"
-struct PS_IN
+// Varyings
+
+static float4 gl_Color[1] =
 {
-	float4 pos : SV_POSITION;
-	float4 col : COLOR;
+    float4(0, 0, 0, 0)
 };
 
-float4 PS( PS_IN input ) : SV_Target
+cbuffer DriverConstants : register(b1)
 {
-	return float4(1.0, 0.0, 0.0, 1.0);
+};
+
+
+#define GL_USES_FRAG_COLOR
+void gl_main()
+{
+{
+(gl_Color[0] = float4(1.0, 0.0, 0.0, 1.0));
+}
+}
+;
+struct PS_INPUT
+{
+};
+
+struct PS_OUTPUT
+{
+    float4 gl_Color0 : SV_Target0;
+    float4 gl_Color1 : SV_Target1;
+    float4 gl_Color2 : SV_Target2;
+    float4 gl_Color3 : SV_Target3;
+    float4 gl_Color4 : SV_Target4;
+    float4 gl_Color5 : SV_Target5;
+    float4 gl_Color6 : SV_Target6;
+    float4 gl_Color7 : SV_Target7;
+};
+
+PS_OUTPUT main(PS_INPUT input)
+{
+
+    gl_main();
+
+    PS_OUTPUT output;
+    output.gl_Color0 = gl_Color[0];
+    output.gl_Color1 = gl_Color[0];
+    output.gl_Color2 = gl_Color[0];
+    output.gl_Color3 = gl_Color[0];
+    output.gl_Color4 = gl_Color[0];
+    output.gl_Color5 = gl_Color[0];
+    output.gl_Color6 = gl_Color[0];
+    output.gl_Color7 = gl_Color[0];
+
+    return output;
 }";
 
-            var vertexShaderByteCode = ShaderBytecode.Compile(vertexShaderSource, "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
+            var vertexShaderByteCode = ShaderBytecode.Compile(vertexShaderSource, "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             var vertexShader = new VertexShader(device, vertexShaderByteCode);
 
             //var pixelShaderByteCode = ShaderBytecode.CompileFromFile("MiniTri.fx", "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
-            var pixelShaderByteCode = ShaderBytecode.Compile(pixelShaderSource, "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
+            var pixelShaderByteCode = ShaderBytecode.Compile(pixelShaderSource, "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
             var pixelShader = new PixelShader(device, pixelShaderByteCode);
 
             // Layout from VertexShader input signature
