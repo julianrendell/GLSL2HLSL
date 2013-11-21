@@ -20,6 +20,9 @@
 
 //STRUCTS & ENUMS================================================================================================================
 
+std::string pixelHLSL;
+std::string vertexHLSL;
+
 typedef unsigned int     GLenum; // Copied from gl2.h
 
 // Enum taken from constants.h

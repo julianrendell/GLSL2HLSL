@@ -1007,8 +1007,8 @@ int packVaryings(const Varying *packing[][4], FragmentShader *fragmentShader)
 
 void link()
 {
-	std::string pixelHLSL = fShader->mHlsl;
-	std::string vertexHLSL = vShader->mHlsl;
+	pixelHLSL = fShader->mHlsl;
+	vertexHLSL = vShader->mHlsl;
 
 	// Map the varyings to the register file
     const Varying *packing[IMPLEMENTATION_MAX_VARYING_VECTORS][4] = {NULL};
@@ -1032,6 +1032,14 @@ void link()
 	if (!linkUniforms(vShader->mActiveUniforms, fShader->mActiveUniforms))
     {
         throw std::runtime_error("Failed to link uniforms");
+    }
+
+	// special case for gl_DepthRange, the only built-in uniform (also a struct)
+	if (vShader->mUsesDepthRange || fShader->mUsesDepthRange)
+    {
+        mUniforms.push_back(new Uniform(GL_FLOAT, GL_HIGH_FLOAT, "gl_DepthRange.near", 0));
+        mUniforms.push_back(new Uniform(GL_FLOAT, GL_HIGH_FLOAT, "gl_DepthRange.far", 0));
+        mUniforms.push_back(new Uniform(GL_FLOAT, GL_HIGH_FLOAT, "gl_DepthRange.diff", 0));
     }
 }
 
