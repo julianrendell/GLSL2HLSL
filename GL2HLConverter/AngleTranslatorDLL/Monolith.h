@@ -23,6 +23,14 @@
 std::string pixelHLSL;
 std::string vertexHLSL;
 
+enum CoordinateSystem
+{
+	LEFT_HANDED,
+	RIGHT_HANDED
+};
+
+CoordinateSystem cSystem;
+
 typedef unsigned int     GLenum; // Copied from gl2.h
 
 // Enum taken from constants.h
@@ -110,6 +118,7 @@ GLuint mUsedPixelSamplerRange;
 struct Uniform
 {
 	Uniform(GLenum type, GLenum precision, const std::string &name, unsigned int arraySize)
+		: type(type), precision(precision), name(name), arraySize(arraySize)
 	{
 	}
 

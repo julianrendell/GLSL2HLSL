@@ -494,12 +494,21 @@ bool linkVaryings(int registers, const Varying *packing[][4],
                       "    gl_main();\n"
                       "\n"
                       "    VS_OUTPUT output;\n"
-                      "    output.gl_Position.x = gl_Position.x;\n"
-                      "    output.gl_Position.y = -gl_Position.y;\n"
-                      "    output.gl_Position.z = (gl_Position.z + gl_Position.w) * 0.5;\n"
+                      "    output.gl_Position.x = gl_Position.x;\n";
+
+		if (cSystem == LEFT_HANDED)
+		{
+			vertexHLSL += "    output.gl_Position.y = gl_Position.y;\n";
+		}
+		else
+		{
+			vertexHLSL += "    output.gl_Position.y = -gl_Position.y;\n";
+		}
+                      
+		vertexHLSL += "    output.gl_Position.z = (gl_Position.z + gl_Position.w) * 0.5;\n"
                       "    output.gl_Position.w = gl_Position.w;\n";
     }
-    else
+	else
     {
         vertexHLSL += "\n"
                       "    gl_main();\n"
@@ -1268,7 +1277,7 @@ void Shader::parseVaryings()
         mUsesFrontFacing = strstr(mHlsl, "GL_USES_FRONT_FACING") != NULL;
         mUsesPointSize = strstr(mHlsl, "GL_USES_POINT_SIZE") != NULL;
         mUsesPointCoord = strstr(mHlsl, "GL_USES_POINT_COORD") != NULL;
-        mUsesDepthRange = strstr(mHlsl, "GL_USES_DEPTH_RANGE") != NULL;
+		mUsesDepthRange = strstr(mHlsl, "GL_USES_DEPTH_RANGE") != NULL;
         mUsesFragDepth = strstr(mHlsl, "GL_USES_FRAG_DEPTH") != NULL;
         mUsesDiscardRewriting = strstr(mHlsl, "ANGLE_USES_DISCARD_REWRITING") != NULL;
     }
@@ -1367,6 +1376,8 @@ ShBuiltInResources initBuiltInResources()
 
 ANGLETRANSLATORDLL_API void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc /*, char ** vertexHlsl, char ** fragmentHlsl */ )
 {
+	cSystem = LEFT_HANDED;
+
 	vShader = new VertexShader();
 	vShader->mSource = (char*) vertexShaderSrc;
 
