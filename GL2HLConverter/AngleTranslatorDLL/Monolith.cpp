@@ -1365,7 +1365,7 @@ ShBuiltInResources initBuiltInResources()
 	return resources;
 }
 
-void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc, char ** vertexHlsl, char ** fragmentHlsl)
+ANGLETRANSLATORDLL_API void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc /*, char ** vertexHlsl, char ** fragmentHlsl */ )
 {
 	vShader = new VertexShader();
 	vShader->mSource = (char*) vertexShaderSrc;
