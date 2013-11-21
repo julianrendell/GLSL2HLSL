@@ -95,16 +95,17 @@ namespace MiniTri
             // Compile Vertex and Pixel shaders
             //var vertexShaderByteCode = ShaderBytecode.CompileFromFile("MiniTri.fx", "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
 
-            var vertexShaderSource = @"struct VS_IN
+            var vertexShaderSource = @"
+struct VS_IN
 {
 	float4 pos : POSITION;
-	float4 col : COLOR;
+	//float4 col : COLOR;
 };
 
 struct PS_IN
 {
 	float4 pos : SV_POSITION;
-	float4 col : COLOR;
+	//float4 col : COLOR;
 };
 
 PS_IN VS( VS_IN input )
@@ -112,12 +113,13 @@ PS_IN VS( VS_IN input )
 	PS_IN output = (PS_IN)0;
 	
 	output.pos = input.pos;
-	output.col = input.col;
+	//output.col = input.col;
 	
 	return output;
 }";
 
-            var pixelShaderSource = @"struct PS_IN
+            var pixelShaderSource = @"
+struct PS_IN
 {
 	float4 pos : SV_POSITION;
 	float4 col : COLOR;
@@ -125,7 +127,7 @@ PS_IN VS( VS_IN input )
 
 float4 PS( PS_IN input ) : SV_Target
 {
-	return input.col;
+	return float4(1.0, 0.0, 0.0, 1.0);
 }";
 
             var vertexShaderByteCode = ShaderBytecode.Compile(vertexShaderSource, "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
@@ -142,21 +144,21 @@ float4 PS( PS_IN input ) : SV_Target
                 new[]
                     {
                         new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
-                        new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0)
+                        //new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0)
                     });
 
             // Instantiate Vertex buiffer from vertex data
             var vertices = Buffer.Create(device, BindFlags.VertexBuffer, new[]
                                   {
-                                      new Vector4(0.0f, 0.5f, 0.5f, 1.0f), new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-                                      new Vector4(0.5f, -0.5f, 0.5f, 1.0f), new Vector4(0.0f, 1.0f, 0.0f, 1.0f),
-                                      new Vector4(-0.5f, -0.5f, 0.5f, 1.0f), new Vector4(0.0f, 0.0f, 1.0f, 1.0f)
+                                      new Vector4(0.0f, 0.5f, 0.5f, 1.0f), //new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
+                                      new Vector4(0.5f, -0.5f, 0.5f, 1.0f), //new Vector4(0.0f, 1.0f, 0.0f, 1.0f),
+                                      new Vector4(-0.5f, -0.5f, 0.5f, 1.0f), //new Vector4(0.0f, 0.0f, 1.0f, 1.0f)
                                   });
 
             // Prepare All the stages
             context.InputAssembler.InputLayout = layout;
             context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(vertices, 32, 0));
+            context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(vertices, 16, 0));
             context.VertexShader.Set(vertexShader);
             context.Rasterizer.SetViewport(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f));
             context.PixelShader.Set(pixelShader);
