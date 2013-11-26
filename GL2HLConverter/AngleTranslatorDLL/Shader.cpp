@@ -1,5 +1,24 @@
 #include "Shader.h"
 
+
+VertexShader::VertexShader(const char *shaderSrc)
+{
+	setSource(shaderSrc);
+}
+
+VertexShader::~VertexShader()
+{
+}
+
+FragmentShader::FragmentShader(const char *shaderSrc)
+{
+	setSource(shaderSrc);
+}
+
+FragmentShader::~FragmentShader()
+{
+}
+
 void *Shader::mCompiler = NULL;
 
 GLenum Shader::parseType(const std::string &type)
@@ -184,9 +203,11 @@ void Shader::resetVaryingsRegisterAssignment()
 
 void VertexShader::parseAttributes()
 {
-	if (mHlsl)
+	const char *hlsl = getHLSL();
+
+	if (hlsl)
     {
-		const char *input = strstr(mHlsl, "// Attributes") + 14;
+		const char *input = strstr(hlsl, "// Attributes") + 14;
 
         while(true)
         {
@@ -338,4 +359,19 @@ void FragmentShader::compile()
 
 	parseVaryings();
 	mVaryings.sort(compareVarying);
+}
+
+const char *Shader::getHLSL()
+{
+    return mHlsl;
+}
+
+void Shader::setSource(const char *shaderSrc)
+{
+	mSource = (char*) shaderSrc;
+}
+
+void Shader::setHLSL(const char *hlsl)
+{
+	mHlsl = (char*) hlsl;
 }

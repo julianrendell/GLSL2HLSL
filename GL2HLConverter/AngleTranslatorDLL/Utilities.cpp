@@ -67,3 +67,38 @@ int VariableRowCount(GLenum type)
 
     return 0;
 }
+
+// This method came from utilities.cpp
+int AllocateFirstFreeBits(unsigned int *bits, unsigned int allocationSize, unsigned int bitsSize)
+{
+	if (allocationSize <= bitsSize)
+	{
+		throw new std::runtime_error("Allocation size is greater than bits size");
+	}
+
+	unsigned int mask = std::numeric_limits<unsigned int>::max() >> (std::numeric_limits<unsigned int>::digits - allocationSize);
+
+	for (unsigned int i = 0; i < bitsSize - allocationSize + 1; i++)
+	{
+		if ((*bits & mask) == 0)
+		{
+			*bits |= mask;
+			return i;
+		}
+
+		mask <<= 1;
+	}
+
+	return -1;
+}
+
+std::string str(int i)
+{
+	int size = _scprintf("%d", i);
+	char *buffer = new char[size+1];
+
+	sprintf(buffer, "%d", i);
+	buffer[size+1] = '\0';
+
+	return buffer;
+}

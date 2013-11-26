@@ -89,7 +89,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AngleTranslatorDLL.h" />
+    <ClInclude Include="Angletypes.h" />
     <ClInclude Include="Monolith.h" />
+    <ClInclude Include="Program.h" />
+    <ClInclude Include="ProgramBinary.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -107,6 +110,8 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Monolith.cpp" />
+    <ClCompile Include="Program.cpp" />
+    <ClCompile Include="ProgramBinary.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

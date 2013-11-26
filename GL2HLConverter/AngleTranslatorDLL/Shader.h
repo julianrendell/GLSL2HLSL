@@ -1,3 +1,6 @@
+#ifndef SHADER_H_
+#define SHADER_H_
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <string>
@@ -62,14 +65,17 @@ public:
 	}
 	
 	bool isCompiled();
+	const char * getHLSL();
 
-//protected:
+protected:
 	ShBuiltInResources initBuiltInResources();
 	void compileToHLSL(ShShaderType shaderType);
 	void parseVaryings();
 	void resetVaryingsRegisterAssignment();
 	GLenum parseType(const std::string &type);
 	static bool compareVarying(const Varying &x, const Varying &y);
+	void setSource(const char *shaderSrc);
+	void setHLSL(const char *shaderSrc);
 
 	bool mUsesMultipleRenderTargets;
     bool mUsesFragColor;
@@ -84,7 +90,9 @@ public:
 
 	VaryingList mVaryings;
 
-//private:
+private:
+	friend class ProgramBinary;
+
 	void constructCompiler(ShShaderType shaderType, ShBuiltInResources resources);
 
 	static void *mCompiler;
@@ -96,16 +104,24 @@ public:
 
 class VertexShader : public Shader
 {
-  public:
-    void parseAttributes();
-	int getSemanticIndex(const std::string &attributeName);
-	void compile();
+	public:
+		VertexShader(const char *shaderSrc);
+		~VertexShader();
 
-    AttributeArray mAttributes;
+		void parseAttributes();
+		int getSemanticIndex(const std::string &attributeName);
+		void compile();
+
+		AttributeArray mAttributes;
 };
 
 class FragmentShader : public Shader
 {
-  public:
-	void compile();
+	public:
+		FragmentShader(const char *shaderSrc);
+		~FragmentShader();
+
+		void compile();
 };
+
+#endif

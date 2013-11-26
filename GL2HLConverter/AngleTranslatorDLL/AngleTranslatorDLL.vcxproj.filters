@@ -39,6 +39,15 @@
     <ClInclude Include="Uniform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProgramBinary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Angletypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Program.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -57,6 +66,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgramBinary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

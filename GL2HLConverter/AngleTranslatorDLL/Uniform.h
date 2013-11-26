@@ -1,4 +1,7 @@
 #include <string>
+#ifndef UNIFORM_H_
+#define UNIFORM_H_
+
 #include <vector>
 
 #include "GLES2\gl2.h"
@@ -29,3 +32,6 @@ struct Uniform
 typedef std::vector<Uniform> ActiveUniforms;
 
 typedef std::vector<Uniform*> UniformArray;
+
+
+#endif
