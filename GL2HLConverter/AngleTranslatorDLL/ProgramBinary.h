@@ -1,6 +1,8 @@
 #ifndef PROGRAM_BINARY_H_
 #define PROGRAM_BINARY_H_
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #define GL_NONE                           0 // Copied from gl2.h
 #define	D3D11_VS_OUTPUT_REGISTER_COUNT	( 32 )
 #define	D3D11_SHADER_MAJOR_VERSION	( 5 )

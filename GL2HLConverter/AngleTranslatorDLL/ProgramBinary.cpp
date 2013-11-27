@@ -974,8 +974,8 @@ void ProgramBinary::link(AttributeBindings mAttributeBindings, FragmentShader *f
 		mUniforms.push_back(new Uniform(GL_FLOAT, GL_HIGH_FLOAT, "gl_DepthRange.diff", 0));
 	}
 
-	vShader->setHLSL(vertexHLSL.c_str());
-	fShader->setHLSL(pixelHLSL.c_str());
+	vShader->setHLSL(cstr(vertexHLSL));
+	fShader->setHLSL(cstr(pixelHLSL));
 }
 
 int AttributeBindings::getAttributeBinding(const std::string &name) const

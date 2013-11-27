@@ -12,6 +12,7 @@ int VariableRowCount(GLenum type);
 int AllocateFirstFreeBits(unsigned int *bits, unsigned int allocationSize, unsigned int bitsSize);
 
 std::string str(int i);
+char* cstr(std::string str);
 
 
 #endif
