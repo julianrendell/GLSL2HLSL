@@ -90,7 +90,8 @@
   <ItemGroup>
     <ClInclude Include="AngleTranslatorDLL.h" />
     <ClInclude Include="Angletypes.h" />
-    <ClInclude Include="Monolith.h" />
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="GLSLConverter.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="ProgramBinary.h" />
     <ClInclude Include="Shader.h" />
@@ -109,7 +110,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Monolith.cpp" />
+    <ClCompile Include="GLSLConverter.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="ProgramBinary.cpp" />
     <ClCompile Include="Shader.cpp" />

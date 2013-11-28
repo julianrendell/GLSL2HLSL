@@ -115,7 +115,7 @@ void CLRAngleTranslator::GetShader(String ^ vShader, String ^ fShader)
 	IntPtr vip = Marshal::StringToHGlobalAnsi(fShader);
 	const char* fSrc = static_cast<const char*>(vip.ToPointer());
 	
-	humongoid(vSrc, fSrc);
+	humongoid(vSrc, fSrc, LEFT_CARTESIAN);
 	
 	Marshal::FreeHGlobal(fip);
 	Marshal::FreeHGlobal(vip);

@@ -496,7 +496,7 @@ bool ProgramBinary::linkVaryings(int registers, const Varying *packing[][4],
 						"    VS_OUTPUT output;\n"
 						"    output.gl_Position.x = gl_Position.x;\n";
 
-		if (coordSystem == LEFT_CARTESIAN)
+		if (coordinateSystem == LEFT_CARTESIAN)
 		{
 			vertexHLSL += "    output.gl_Position.y = gl_Position.y;\n";
 		}

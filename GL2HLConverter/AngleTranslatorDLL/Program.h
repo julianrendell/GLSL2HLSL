@@ -5,6 +5,7 @@
 #include "GLES2\gl2.h"
 #include "ProgramBinary.h"
 #include "Shader.h"
+#include "Constants.h"
 
 
 class AttributeBindings

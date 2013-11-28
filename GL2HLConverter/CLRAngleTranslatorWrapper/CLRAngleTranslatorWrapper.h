@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "AngleTranslatorDLL.h"
-#include "Monolith.h"
+//#include "AngleTranslatorDLL.h"
+#include "GLSLConverter.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices; 

@@ -3,22 +3,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#define GL_NONE                           0 // Copied from gl2.h
-#define	D3D11_VS_OUTPUT_REGISTER_COUNT	( 32 )
-#define	D3D11_SHADER_MAJOR_VERSION	( 5 )
-#define	D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT	( 8 )
-
-#define MAX_VERTEX_ATTRIBS ( 16 )
-#define MAX_TEXTURE_IMAGE_UNITS ( 16 )
-#define MAX_TEXTURE_IMAGE_UNITS_VTF_SN4 ( 16 )
-
-// Implementation upper limits, real maximums depend on the hardware
-#define IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS ( 16 )
-#define IMPLEMENTATION_MAX_COMBINED_TEXTURE_IMAGE_UNITS ( MAX_TEXTURE_IMAGE_UNITS + IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS )
-#define IMPLEMENTATION_MAX_VARYING_VECTORS ( 32 )
-#define IMPLEMENTATION_MAX_DRAW_BUFFERS ( 8 )
-#define MAX_VERTEX_UNIFORM_VECTORS_D3D11 ( 1024 )
-#define MAX_FRAGMENT_UNIFORM_VECTORS_D3D11 ( 1024 )
+#define GL_NONE ( 0 )
 
 #include <stdio.h>
 #include <set>
@@ -28,6 +13,7 @@
 #include "Shader.h"
 #include "Angletypes.h"
 #include "Program.h"
+#include "Constants.h"
 
 
 class AttributeBindings;
@@ -56,7 +42,6 @@ class ProgramBinary
 		GLint getUniformLocation(std::string name);
 		std::string decorateAttribute(const std::string &name);
 
-		CoordinateSystemType coordSystem;
 
 	private:
 		bool defineUniform(GLenum shader, const Uniform &constant);
