@@ -1,8 +1,8 @@
 #include "GLSLConverter.h"
 
-ANGLETRANSLATORDLL_API void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc, CoordinateSystemType coordinateSystemType /*, char ** vertexHlsl, char ** fragmentHlsl */ )
+ANGLETRANSLATORDLL_API void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc, CoordinateSystemType coordinateSystem /*, char ** vertexHlsl, char ** fragmentHlsl */ )
 {
-	coordinateSystem = coordinateSystemType;
+	coordinateSystemType = coordinateSystem;
 
 	Program *program = new Program();
 

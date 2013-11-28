@@ -25,7 +25,4 @@ const float ALIASED_LINE_WIDTH_RANGE_MIN = 1.0f;
 const float ALIASED_LINE_WIDTH_RANGE_MAX = 1.0f;
 const float ALIASED_POINT_SIZE_RANGE_MIN = 1.0f;
 
-static CoordinateSystemType coordinateSystem;
-
-
 #endif // LIBGLESV2_CONSTANTS_H_

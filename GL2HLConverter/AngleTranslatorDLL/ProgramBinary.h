@@ -14,6 +14,7 @@
 #include "Angletypes.h"
 #include "Program.h"
 #include "Constants.h"
+#include "Configuration.h"
 
 
 class AttributeBindings;
