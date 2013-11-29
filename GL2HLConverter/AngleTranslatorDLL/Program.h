@@ -7,37 +7,39 @@
 #include "Shader.h"
 #include "Constants.h"
 
-
-class AttributeBindings
+namespace gl
 {
-	public:
-		AttributeBindings();
-		~AttributeBindings();
+	class AttributeBindings
+	{
+		public:
+			AttributeBindings();
+			~AttributeBindings();
 
-		void bindAttributeLocation(GLuint index, const char *name);
-		int getAttributeBinding(const std::string &name) const;
+			void bindAttributeLocation(GLuint index, const char *name);
+			int getAttributeBinding(const std::string &name) const;
 
-	private:
-		std::set<std::string> mAttributeBinding[MAX_VERTEX_ATTRIBS];
-};
+		private:
+			std::set<std::string> mAttributeBinding[MAX_VERTEX_ATTRIBS];
+	};
 
-class Program
-{
-	public:
-		Program();
-		~Program();
+	class Program
+	{
+		public:
+			Program();
+			~Program();
 
-		void attachShaders(VertexShader *vShader, FragmentShader *fShader);
-		void bindAttributeLocation(GLuint index, const char *name);
-		void link();
+			void attachShaders(VertexShader *vShader, FragmentShader *fShader);
+			void bindAttributeLocation(GLuint index, const char *name);
+			void link();
 
-	private:
-		FragmentShader *mFragmentShader;
-		VertexShader *mVertexShader;
+		private:
+			FragmentShader *mFragmentShader;
+			VertexShader *mVertexShader;
 
-		ProgramBinary *programBinary;
+			ProgramBinary *programBinary;
 
-		AttributeBindings mAttributeBindings;
-};
+			AttributeBindings mAttributeBindings;
+	};
+}
 
 #endif

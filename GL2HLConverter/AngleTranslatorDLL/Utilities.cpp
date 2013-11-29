@@ -71,7 +71,7 @@ int VariableRowCount(GLenum type)
 // This method came from utilities.cpp
 int AllocateFirstFreeBits(unsigned int *bits, unsigned int allocationSize, unsigned int bitsSize)
 {
-	if (allocationSize <= bitsSize)
+	if (allocationSize > bitsSize)
 	{
 		throw new std::runtime_error("Allocation size is greater than bits size");
 	}
@@ -109,4 +109,54 @@ char* cstr(std::string str)
 	std::strcpy(cstr, str.c_str());
 
 	return cstr;
+}
+
+GLenum UniformComponentType(GLenum type)
+{
+    switch(type)
+    {
+      case GL_BOOL:
+      case GL_BOOL_VEC2:
+      case GL_BOOL_VEC3:
+      case GL_BOOL_VEC4:
+          return GL_BOOL;
+      case GL_FLOAT:
+      case GL_FLOAT_VEC2:
+      case GL_FLOAT_VEC3:
+      case GL_FLOAT_VEC4:
+      case GL_FLOAT_MAT2:
+      case GL_FLOAT_MAT3:
+      case GL_FLOAT_MAT4:
+          return GL_FLOAT;
+      case GL_INT:
+      case GL_SAMPLER_2D:
+      case GL_SAMPLER_CUBE:
+      case GL_INT_VEC2:
+      case GL_INT_VEC3:
+      case GL_INT_VEC4:
+          return GL_INT;
+      default:
+          throw new std::runtime_error("Unknown uniform component type");
+    }
+
+    return GL_NONE;
+}
+
+size_t UniformComponentSize(GLenum type)
+{
+    switch(type)
+    {
+      case GL_BOOL:  return sizeof(GLint);
+      case GL_FLOAT: return sizeof(GLfloat);
+      case GL_INT:   return sizeof(GLint);
+	  default:       throw new std::runtime_error("Unknown uniform component size");
+    }
+
+    return 0;
+}
+
+size_t UniformInternalSize(GLenum type)
+{
+    // Expanded to 4-element vectors
+    return UniformComponentSize(UniformComponentType(type)) * VariableRowCount(type) * 4;
 }

@@ -92,13 +92,14 @@
     <ClInclude Include="Angletypes.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="GLESUniform.h" />
     <ClInclude Include="GLSLConverter.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="ProgramBinary.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Uniform.h" />
+    <ClInclude Include="TranslatorUniform.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +120,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GLESUniform.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

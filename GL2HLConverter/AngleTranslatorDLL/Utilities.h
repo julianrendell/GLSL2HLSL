@@ -14,5 +14,9 @@ int AllocateFirstFreeBits(unsigned int *bits, unsigned int allocationSize, unsig
 std::string str(int i);
 char* cstr(std::string str);
 
+GLenum UniformComponentType(GLenum type);
+size_t UniformInternalSize(GLenum type);
+size_t UniformExternalSize(GLenum type);
+
 
 #endif
