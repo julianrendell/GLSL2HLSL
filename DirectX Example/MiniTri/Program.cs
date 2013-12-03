@@ -92,112 +92,14 @@ namespace MiniTri
             var backBuffer = Texture2D.FromSwapChain<Texture2D>(swapChain, 0);
             var renderView = new RenderTargetView(device, backBuffer);
 
+
             // Compile Vertex and Pixel shaders
-            //var vertexShaderByteCode = ShaderBytecode.CompileFromFile("MiniTri.fx", "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
-
-            var vertexShaderSource = @"
-// Attributes
-static float4 _vPosition = {0, 0, 0, 0};
-
-static float4 gl_Position = float4(0, 0, 0, 0);
-
-// Varyings
-
-
-;
-void gl_main()
-{
-{
-(gl_Position = _vPosition);
-}
-}
-;
-struct VS_INPUT
-{
-    float4 _vPosition : TEXCOORD0;
-};
-
-struct VS_OUTPUT
-{
-    float4 gl_Position : SV_Position;
-};
-
-VS_OUTPUT main(VS_INPUT input)
-{
-    _vPosition = (input._vPosition);
-
-    gl_main();
-
-    VS_OUTPUT output;
-    output.gl_Position.x = gl_Position.x;
-    output.gl_Position.y = gl_Position.y;
-    output.gl_Position.z = (gl_Position.z + gl_Position.w) * 0.5;
-    output.gl_Position.w = gl_Position.w;
-
-    return output;
-}
-";
-
-            var pixelShaderSource = @"
-// Varyings
-
-static float4 gl_Color[1] =
-{
-    float4(0, 0, 0, 0)
-};
-
-cbuffer DriverConstants : register(b1)
-{
-};
-
-
-#define GL_USES_FRAG_COLOR
-void gl_main()
-{
-{
-(gl_Color[0] = float4(1.0, 0.0, 0.0, 1.0));
-}
-}
-;
-struct PS_INPUT
-{
-};
-
-struct PS_OUTPUT
-{
-    float4 gl_Color0 : SV_Target0;
-    float4 gl_Color1 : SV_Target1;
-    float4 gl_Color2 : SV_Target2;
-    float4 gl_Color3 : SV_Target3;
-    float4 gl_Color4 : SV_Target4;
-    float4 gl_Color5 : SV_Target5;
-    float4 gl_Color6 : SV_Target6;
-    float4 gl_Color7 : SV_Target7;
-};
-
-PS_OUTPUT main(PS_INPUT input)
-{
-
-    gl_main();
-
-    PS_OUTPUT output;
-    output.gl_Color0 = gl_Color[0];
-    output.gl_Color1 = gl_Color[0];
-    output.gl_Color2 = gl_Color[0];
-    output.gl_Color3 = gl_Color[0];
-    output.gl_Color4 = gl_Color[0];
-    output.gl_Color5 = gl_Color[0];
-    output.gl_Color6 = gl_Color[0];
-    output.gl_Color7 = gl_Color[0];
-
-    return output;
-}";
-
-            var vertexShaderByteCode = ShaderBytecode.Compile(vertexShaderSource, "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
+            var vertexShaderByteCode = ShaderBytecode.CompileFromFile("ReflectionVertex.fx", "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
+            //var vertexShaderByteCode = ShaderBytecode.Compile(vertexShaderSource, "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             var vertexShader = new VertexShader(device, vertexShaderByteCode);
 
-            //var pixelShaderByteCode = ShaderBytecode.CompileFromFile("MiniTri.fx", "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
-            var pixelShaderByteCode = ShaderBytecode.Compile(pixelShaderSource, "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
+            var pixelShaderByteCode = ShaderBytecode.CompileFromFile("ReflectionFragment.fx", "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
+            //var pixelShaderByteCode = ShaderBytecode.Compile(pixelShaderSource, "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
             var pixelShader = new PixelShader(device, pixelShaderByteCode);
 
             // Layout from VertexShader input signature
@@ -207,16 +109,79 @@ PS_OUTPUT main(PS_INPUT input)
                 new[]
                     {
                         new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 0, 0),
+                        new InputElement("TEXCOORD", 1, Format.R32G32_Float, 16, 0),
                         //new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0)
                     });
 
             // Instantiate Vertex buiffer from vertex data
             var vertices = Buffer.Create(device, BindFlags.VertexBuffer, new[]
                                   {
-                                      new Vector4(0.0f, 0.5f, 0.5f, 1.0f),
-                                      new Vector4(0.5f, -0.5f, 0.5f, 1.0f),
-                                      new Vector4(-0.5f, -0.5f, 0.5f, 1.0f),
+                                      // 3D coordinates              UV Texture coordinates
+                                      -1.0f, -1.0f, -1.0f, 1.0f,     0.0f, 1.0f, // Front
+                                      -1.0f,  1.0f, -1.0f, 1.0f,     0.0f, 0.0f,
+                                       1.0f,  1.0f, -1.0f, 1.0f,     1.0f, 0.0f,
+                                      -1.0f, -1.0f, -1.0f, 1.0f,     0.0f, 1.0f,
+                                       1.0f,  1.0f, -1.0f, 1.0f,     1.0f, 0.0f,
+                                       1.0f, -1.0f, -1.0f, 1.0f,     1.0f, 1.0f,
                                   });
+
+
+
+            //// Create Depth Buffer & View
+            //var depthBuffer = new Texture2D(device, new Texture2DDescription()
+            //{
+            //    Format = Format.D32_Float_S8X24_UInt,
+            //    ArraySize = 1,
+            //    MipLevels = 1,
+            //    Width = form.ClientSize.Width,
+            //    Height = form.ClientSize.Height,
+            //    SampleDescription = new SampleDescription(1, 0),
+            //    Usage = ResourceUsage.Default,
+            //    BindFlags = BindFlags.DepthStencil,
+            //    CpuAccessFlags = CpuAccessFlags.None,
+            //    OptionFlags = ResourceOptionFlags.None
+            //});
+
+            //var depthView = new DepthStencilView(device, depthBuffer);
+
+            // Load texture and create sampler
+            var texture = Texture2D.FromFile<Texture2D>(device, "saddog.jpg");
+            var textureView = new ShaderResourceView(device, texture);
+
+            var sampler = new SamplerState(device, new SamplerStateDescription()
+            {
+                Filter = Filter.MinMagMipLinear,
+                AddressU = TextureAddressMode.Wrap,
+                AddressV = TextureAddressMode.Wrap,
+                AddressW = TextureAddressMode.Wrap,
+                BorderColor = Color.Azure,
+                ComparisonFunction = Comparison.Never,
+                MaximumAnisotropy = 16,
+                MipLodBias = 0,
+                MinimumLod = 0,
+                MaximumLod = 16,
+            });
+
+
+            //var getUniform = new Buffer(device, new BufferDescription
+            //{
+            //    Usage = ResourceUsage.Default,
+            //    SizeInBytes = sizeof(Variables),
+            //    BindFlags = BindFlags.ConstantBuffer
+            //});
+
+            //var cb = new DriverConstants();
+            //cb.R = 1.0f;
+            //cb.G = 0.0f;
+            //cb.B = 0.0f;
+            //cb.A = 1.0f;
+            //var data = new DataStream(sizeof(Variables), true, true);
+            //data.Write(cb);
+            //data.Position = 0;
+
+            //context.UpdateSubresource(new DataBox(data.PositionPointer, 0, 0), getUniform, 0);
+            //context.VertexShader.SetConstantBuffer(0, getUniform);
+
 
             // Prepare All the stages
             context.InputAssembler.InputLayout = layout;
@@ -225,15 +190,27 @@ PS_OUTPUT main(PS_INPUT input)
             context.VertexShader.Set(vertexShader);
             context.Rasterizer.SetViewport(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f));
             context.PixelShader.Set(pixelShader);
+            context.PixelShader.SetSampler(0, sampler);
+            context.PixelShader.SetShaderResource(0, textureView);
             context.OutputMerger.SetTargets(renderView);
+
+            // Can check if uniforms exist
+            //var shaderReflector = new ShaderReflection(pixelShaderByteCode);
+            //var boundResources = shaderReflector.Description.BoundResources;
+
+            //InputBindingDescription description1 = shaderReflector.GetResourceBindingDescription(0);
+            //InputBindingDescription description2 = shaderReflector.GetResourceBindingDescription(1);
+            //InputBindingDescription description3 = shaderReflector.GetResourceBindingDescription(2);
+
 
             // Main loop
             RenderLoop.Run(form, () =>
                                       {
                                           context.ClearRenderTargetView(renderView, Color.Black);
-                                          context.Draw(3, 0);
+                                          context.Draw(6, 0);
                                           swapChain.Present(0, PresentFlags.None);
                                       });
+
 
             // Release all resources
             vertexShaderByteCode.Dispose();
