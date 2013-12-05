@@ -4,7 +4,9 @@
 #include "AngleTranslatorDLL.h"
 #include "Program.h"
 
-ANGLETRANSLATORDLL_API void humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc, CoordinateSystemType coordinateSystem);
+HlslBag *bag;
+
+ANGLETRANSLATORDLL_API HlslBag* humongoid(const char * fragmentShaderSrc, const char * vertexShaderSrc, CoordinateSystemType coordinateSystem);
 
 
 #endif

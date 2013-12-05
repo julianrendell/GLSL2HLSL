@@ -1,6 +1,6 @@
 #include "GLSLConverter.h"
 
-ANGLETRANSLATORDLL_API void humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc, CoordinateSystemType coordinateSystem /*, char ** vertexHlsl, char ** fragmentHlsl */ )
+ANGLETRANSLATORDLL_API HlslBag* humongoid(const char * vertexShaderSrc, const char * fragmentShaderSrc, CoordinateSystemType coordinateSystem /*, char ** vertexHlsl, char ** fragmentHlsl */ )
 {
 	coordinateSystemType = coordinateSystem;
 
@@ -15,4 +15,10 @@ ANGLETRANSLATORDLL_API void humongoid(const char * vertexShaderSrc, const char *
 	program->attachShaders(vShader, fShader);
 	//program->bindAttributeLocation(0, "vPosition"); // Attribute binding appears to be optional (not sure) - seems to happen in linkAttributes
 	program->link();
+
+	bag = new HlslBag();
+	bag->vertexHlsl = vShader->getHLSL();
+	bag->fragmentHlsl = fShader->getHLSL();
+
+	return bag;
 };

@@ -4,6 +4,7 @@
 
 //#include "AngleTranslatorDLL.h"
 #include "GLSLConverter.h"
+#include "ManagedHlslBag.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices; 
@@ -23,8 +24,7 @@ namespace CLRAngleTranslatorWrapper {
 
         ~CLRAngleTranslator();
 
-		String ^ ConvertToHLSL(String ^ shader);
-		void GetShader(String ^ vShader, String ^ fShader);
+		ManagedHlslBag ^ ConvertToHlsl(String ^ vShader, String ^ fShader);
 
 	protected: 
         !CLRAngleTranslator();
