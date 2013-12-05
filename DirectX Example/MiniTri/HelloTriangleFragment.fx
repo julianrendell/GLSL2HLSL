@@ -9,15 +9,14 @@ cbuffer DriverConstants : register(b1)
 {
 };
 
-uniform float _Base : register(c0);
-uniform float _Bias : register(c1);
-uniform float _Percentage : register(c2);
+uniform float4 Color : register(c0);
 
 #define GL_USES_FRAG_COLOR
 void gl_main()
 {
 {
-(gl_Color[0] = float4(1.0, 0.0, 0.0, 1.0));
+(gl_Color[0] = Color);
+//(gl_Color[0] = float4(1.0, 0.0, 0.0, 1.0));
 }
 }
 ;
