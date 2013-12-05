@@ -9,19 +9,23 @@ cbuffer DriverConstants : register(b1)
 {
 };
 
+Texture2D picture;
+SamplerState pictureSampler;
 uniform float4 Color : register(c0);
 
 #define GL_USES_FRAG_COLOR
-void gl_main()
+void gl_main(float2 tex)
 {
 {
-(gl_Color[0] = Color);
-//(gl_Color[0] = float4(1.0, 0.0, 0.0, 1.0));
+(gl_Color[0] = picture.Sample(pictureSampler, tex));
+gl_Color[0].w = Color.w;
 }
 }
 ;
 struct PS_INPUT
 {
+	float4 pos : SV_POSITION;
+	float2 tex : TEXCOORD;
 };
 
 struct PS_OUTPUT
@@ -39,7 +43,7 @@ struct PS_OUTPUT
 PS_OUTPUT main(PS_INPUT input)
 {
 
-    gl_main();
+    gl_main(input.tex);
 
     PS_OUTPUT output;
     output.gl_Color0 = gl_Color[0];

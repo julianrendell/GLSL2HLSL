@@ -126,24 +126,25 @@ namespace MiniTri
                 new[]
                     {
                         new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 0, 0),
+                        new InputElement("TEXCOORD", 1, Format.R32G32_Float, 16, 0)
                         //new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0)
                     });
 
             // Instantiate Vertex buiffer from vertex data
             var vertices = Buffer.Create(device, BindFlags.VertexBuffer, new[]
                                   {
-                                      -1.0f, -1.0f, -1.0f, 1.0f,//     0.0f, 1.0f, // Front
-                                      -1.0f,  1.0f, -1.0f, 1.0f,//     0.0f, 0.0f,
-                                       1.0f,  1.0f, -1.0f, 1.0f,//     1.0f, 0.0f,
-                                      -1.0f, -1.0f, -1.0f, 1.0f,//     0.0f, 1.0f,
-                                       1.0f,  1.0f, -1.0f, 1.0f,//     1.0f, 0.0f,
-                                       1.0f, -1.0f, -1.0f, 1.0f,//     1.0f, 1.0f,
+                                      -1.0f, -1.0f, -1.0f, 1.0f,     0.0f, 1.0f, // Front
+                                      -1.0f,  1.0f, -1.0f, 1.0f,     0.0f, 0.0f,
+                                       1.0f,  1.0f, -1.0f, 1.0f,     1.0f, 0.0f,
+                                      -1.0f, -1.0f, -1.0f, 1.0f,     0.0f, 1.0f,
+                                       1.0f,  1.0f, -1.0f, 1.0f,     1.0f, 0.0f,
+                                       1.0f, -1.0f, -1.0f, 1.0f,     1.0f, 1.0f,
                                   });
 
             // Prepare All the stages
             context.InputAssembler.InputLayout = layout;
             context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(vertices, 16, 0));
+            context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(vertices, 24, 0));
             context.VertexShader.Set(vertexShader);
             context.Rasterizer.SetViewport(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f));
             context.PixelShader.Set(pixelShader);
@@ -161,7 +162,7 @@ namespace MiniTri
                     R = 0.79f,
                     G = 0.5f,
                     B = 1.0f,
-                    A = 0.1f
+                    A = 0.5f
                 };
 
             var data = new DataStream(sizeof(ColorUniforms), true, true);
@@ -170,6 +171,26 @@ namespace MiniTri
 
             context.UpdateSubresource(new DataBox(data.PositionPointer, 0, 0), getUniform, 0);
             context.PixelShader.SetConstantBuffer(0, getUniform);
+
+            var texture = Texture2D.FromFile<Texture2D>(device, "saddog.jpg");
+            var textureView = new ShaderResourceView(device, texture);
+
+            var sampler = new SamplerState(device, new SamplerStateDescription
+            {
+                Filter = Filter.Anisotropic,
+                AddressU = TextureAddressMode.Wrap,
+                AddressV = TextureAddressMode.Wrap,
+                AddressW = TextureAddressMode.Wrap,
+                BorderColor = Color.Black,
+                ComparisonFunction = Comparison.Never,
+                MaximumAnisotropy = 16,
+                MipLodBias = 0,
+                MinimumLod = 0,
+                MaximumLod = 16,
+            });
+
+            context.PixelShader.SetSampler(0, sampler);
+            context.PixelShader.SetShaderResource(0, textureView);
 
             // Main loop
             RenderLoop.Run(form, () =>
