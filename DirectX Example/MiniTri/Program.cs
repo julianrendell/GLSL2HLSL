@@ -119,9 +119,12 @@ namespace MiniTri
             // Instantiate Vertex buiffer from vertex data
             var vertices = Buffer.Create(device, BindFlags.VertexBuffer, new[]
                                   {
-                                      new Vector4(0.0f, 0.5f, 0.5f, 1.0f),
-                                      new Vector4(0.5f, -0.5f, 0.5f, 1.0f),
-                                      new Vector4(-0.5f, -0.5f, 0.5f, 1.0f),
+                                      -1.0f, -1.0f, -1.0f, 1.0f,//     0.0f, 1.0f, // Front
+                                      -1.0f,  1.0f, -1.0f, 1.0f,//     0.0f, 0.0f,
+                                       1.0f,  1.0f, -1.0f, 1.0f,//     1.0f, 0.0f,
+                                      -1.0f, -1.0f, -1.0f, 1.0f,//     0.0f, 1.0f,
+                                       1.0f,  1.0f, -1.0f, 1.0f,//     1.0f, 0.0f,
+                                       1.0f, -1.0f, -1.0f, 1.0f,//     1.0f, 1.0f,
                                   });
 
             // Prepare All the stages
@@ -143,9 +146,9 @@ namespace MiniTri
             var cb = new ColorUniforms
                 {
                     R = 0.0f,
-                    G = 0.0f,
+                    G = 1.0f,
                     B = 1.0f,
-                    A = 1.0f
+                    A = 0.1f
                 };
 
             var data = new DataStream(sizeof(ColorUniforms), true, true);
@@ -159,7 +162,7 @@ namespace MiniTri
             RenderLoop.Run(form, () =>
             {
                 context.ClearRenderTargetView(renderView, Color.Black);
-                context.Draw(3, 0);
+                context.Draw(6, 0);
                 swapChain.Present(0, PresentFlags.None);
             });
 
