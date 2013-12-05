@@ -99,6 +99,19 @@ namespace MiniTri
             var backBuffer = Texture2D.FromSwapChain<Texture2D>(swapChain, 0);
             var renderView = new RenderTargetView(device, backBuffer);
 
+            var blendDescription = new BlendStateDescription();
+            blendDescription.RenderTarget[0].IsBlendEnabled = true;
+            blendDescription.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
+            blendDescription.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
+            blendDescription.RenderTarget[0].BlendOperation = BlendOperation.Add;
+            blendDescription.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
+            blendDescription.RenderTarget[0].DestinationAlphaBlend = BlendOption.Zero;
+            blendDescription.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
+            blendDescription.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+
+            var blendState = new BlendState(device, blendDescription);
+            context.OutputMerger.SetBlendState(blendState, new SharpDX.Color4(1.0f), -1);
+
             // Compile Vertex and Pixel shaders
             var vertexShaderByteCode = ShaderBytecode.CompileFromFile("HelloTriangleVertex.fx", "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             var vertexShader = new VertexShader(device, vertexShaderByteCode);
@@ -145,8 +158,8 @@ namespace MiniTri
 
             var cb = new ColorUniforms
                 {
-                    R = 0.0f,
-                    G = 1.0f,
+                    R = 0.79f,
+                    G = 0.5f,
                     B = 1.0f,
                     A = 0.1f
                 };
