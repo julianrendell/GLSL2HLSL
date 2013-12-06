@@ -43,6 +43,7 @@
 * THE SOFTWARE.
 */
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.D3DCompiler;
@@ -52,6 +53,7 @@ using SharpDX.DXGI;
 using SharpDX.Windows;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
+using CLRAngleTranslatorWrapper;
 
 namespace MiniTri
 {
@@ -112,11 +114,19 @@ namespace MiniTri
             var blendState = new BlendState(device, blendDescription);
             context.OutputMerger.SetBlendState(blendState, new SharpDX.Color4(1.0f), -1);
 
+
+            // Read GLSL and convert to HLSL
+            var clrAngleTranslator = CLRAngleTranslator.Instance;
+            string vertexGlsl = File.ReadAllText(@"Reflection.vsh");
+            string fragmentGlsl = File.ReadAllText(@"Reflection.psh");
+
+            var hlslBag = clrAngleTranslator.ConvertToHlsl(vertexGlsl, fragmentGlsl);
+
             // Compile Vertex and Pixel shaders
-            var vertexShaderByteCode = ShaderBytecode.CompileFromFile("ReflectionVertex.fx", "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
+            var vertexShaderByteCode = ShaderBytecode.Compile(hlslBag.vertexHLSL, "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             var vertexShader = new VertexShader(device, vertexShaderByteCode);
 
-            var pixelShaderByteCode = ShaderBytecode.CompileFromFile("ReflectionFragment.fx", "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
+            var pixelShaderByteCode = ShaderBytecode.Compile(hlslBag.fragmentHLSL, "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
             var pixelShader = new PixelShader(device, pixelShaderByteCode);
 
             // Layout from VertexShader input signature
