@@ -53,8 +53,8 @@ namespace gl
 		mAttributeBindings.bindAttributeLocation(index, name);
 	}
 
-	void Program::link()
+	HlslBag* Program::link()
 	{
-		programBinary->link(mAttributeBindings, mFragmentShader, mVertexShader);
+		return programBinary->link(mAttributeBindings, mFragmentShader, mVertexShader);
 	}
 }

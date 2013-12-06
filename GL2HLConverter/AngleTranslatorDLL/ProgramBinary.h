@@ -20,6 +20,7 @@
 namespace gl
 {
 	class AttributeBindings;
+	class HlslBag;
 
 	// Struct used for correlating uniforms/elements of uniform arrays to handles
 	struct UniformLocation
@@ -33,6 +34,13 @@ namespace gl
 		unsigned int index;
 	};
 
+	struct Sampler
+	{
+		bool active;
+		GLint logicalTextureUnit;
+		TextureType textureType;
+	};
+
 	// ProgramBinary has a few functions from Program.cpp (This was how Angle split it up)
 	class ProgramBinary
 	{
@@ -40,11 +48,12 @@ namespace gl
 			 ProgramBinary();
 			~ProgramBinary();
 
-			void link(AttributeBindings attributeBindings, FragmentShader *fShader, VertexShader *vShader);
+			HlslBag* link(AttributeBindings attributeBindings, FragmentShader *fShader, VertexShader *vShader);
 			void initAttributesByLayout();
 			GLint getUniformLocation(std::string name);
 			std::string decorateAttribute(const std::string &name);
 
+			HlslBag *bag;
 
 		private:
 			bool defineUniform(GLenum shader, const sh::Uniform &constant);
@@ -60,13 +69,6 @@ namespace gl
 			Attribute mLinkedAttribute[MAX_VERTEX_ATTRIBS];
 			int mSemanticIndex[MAX_VERTEX_ATTRIBS];
 			int mAttributesByLayout[MAX_VERTEX_ATTRIBS];
-
-			struct Sampler
-			{
-				bool active;
-				GLint logicalTextureUnit;
-				TextureType textureType;
-			};
 
 			Sampler mSamplersPS[MAX_TEXTURE_IMAGE_UNITS];
 			Sampler mSamplersVS[IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS];

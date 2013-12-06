@@ -926,8 +926,10 @@ namespace gl
 		return registers;
 	}
 
-	void ProgramBinary::link(AttributeBindings mAttributeBindings, FragmentShader *fShader, VertexShader *vShader)
+	HlslBag* ProgramBinary::link(AttributeBindings mAttributeBindings, FragmentShader *fShader, VertexShader *vShader)
 	{
+		bag = new HlslBag();
+		
 		std::string vertexHLSL = vShader->getHLSL();
 		std::string pixelHLSL = fShader->getHLSL();
 
@@ -963,8 +965,14 @@ namespace gl
 			mUniforms.push_back(new gl::Uniform(GL_FLOAT, GL_HIGH_FLOAT, "gl_DepthRange.diff", 0));
 		}
 
-		vShader->setHLSL(cstr(vertexHLSL));
-		fShader->setHLSL(cstr(pixelHLSL));
+		bag->uniforms = &mUniforms;
+		bag->linkedAttributes = mLinkedAttribute;
+		bag->samplerVS = &mSamplersVS;
+		bag->samplerPS = &mSamplersPS;
+		bag->vertexHlsl = cstr(vertexHLSL);
+		bag->fragmentHlsl = cstr(pixelHLSL);
+
+		return bag;
 	}
 
 	int AttributeBindings::getAttributeBinding(const std::string &name) const

@@ -14,11 +14,11 @@ ANGLETRANSLATORDLL_API HlslBag* humongoid(const char * vertexShaderSrc, const ch
 	
 	program->attachShaders(vShader, fShader);
 	//program->bindAttributeLocation(0, "vPosition"); // Attribute binding appears to be optional (not sure) - seems to happen in linkAttributes
-	program->link();
+	HlslBag* bag = program->link();
 
-	bag = new HlslBag();
-	bag->vertexHlsl = vShader->getHLSL();
-	bag->fragmentHlsl = fShader->getHLSL();
+	//bag = new HlslBag();
+	//bag->vertexHlsl = vShader->getHLSL();
+	//bag->fragmentHlsl = fShader->getHLSL();
 
 	return bag;
 };

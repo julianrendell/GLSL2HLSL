@@ -3,25 +3,36 @@
 
 #include <string>
 #include "Angletypes.h"
+#include "GLESUniform.h"
+#include "ProgramBinary.h"
 
 static CoordinateSystemType coordinateSystemType;
 
-
-class HlslBag
+namespace gl
 {
-	public:
-		HlslBag()
-		{
-			vertexHlsl = NULL;
-			fragmentHlsl = NULL;
-		}
+	class HlslBag
+	{
+		public:
+			HlslBag()
+			{
+				vertexHlsl = NULL;
+				fragmentHlsl = NULL;
+				samplerVS = NULL;
+			}
 
-		~HlslBag()
-		{
-		}
+			~HlslBag()
+			{
+			}
 
-		const char *vertexHlsl;
-		const char *fragmentHlsl;
-};
+			const char *vertexHlsl;
+			const char *fragmentHlsl;
+
+			std::vector<Uniform*> *uniforms;
+			Attribute *linkedAttributes;
+			Sampler (*samplerVS)[MAX_TEXTURE_IMAGE_UNITS];
+			Sampler (*samplerPS)[IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS];
+	};
+
+}
 
 #endif

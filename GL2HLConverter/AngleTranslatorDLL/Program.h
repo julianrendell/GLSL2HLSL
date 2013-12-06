@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Constants.h"
 
+
 namespace gl
 {
 	class AttributeBindings
@@ -30,7 +31,7 @@ namespace gl
 
 			void attachShaders(VertexShader *vShader, FragmentShader *fShader);
 			void bindAttributeLocation(GLuint index, const char *name);
-			void link();
+			HlslBag* link();
 
 		private:
 			FragmentShader *mFragmentShader;
