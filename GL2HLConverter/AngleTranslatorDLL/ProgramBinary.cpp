@@ -967,8 +967,8 @@ namespace gl
 
 		bag->uniforms = &mUniforms;
 		bag->linkedAttributes = mLinkedAttribute;
-		bag->samplerVS = &mSamplersVS;
-		bag->samplerPS = &mSamplersPS;
+		bag->samplerVS = &mSamplersVS[0];
+		bag->samplerPS = &mSamplersPS[0];
 		bag->vertexHlsl = cstr(vertexHLSL);
 		bag->fragmentHlsl = cstr(pixelHLSL);
 

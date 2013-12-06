@@ -29,8 +29,8 @@ namespace gl
 
 			std::vector<Uniform*> *uniforms;
 			Attribute *linkedAttributes;
-			Sampler (*samplerVS)[MAX_TEXTURE_IMAGE_UNITS];
-			Sampler (*samplerPS)[IMPLEMENTATION_MAX_VERTEX_TEXTURE_IMAGE_UNITS];
+			Sampler *samplerVS;
+			Sampler *samplerPS;
 	};
 
 }
