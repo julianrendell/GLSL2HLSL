@@ -61,21 +61,9 @@ namespace MiniTri
     internal static class Program
     {
         [StructLayout(LayoutKind.Sequential)]
-        struct BaseStruct
+        struct ShaderUniforms
         {
-            public float Base, P1, P2, P3; // Padding
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct BiasStruct
-        {
-            public float Bias, P1, P2, P3; // Padding
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct PercentageStruct
-        {
-            public float Percentage, P1, P2, P3; // Padding
+            public float Base, P1, P2, P3, Bias, P4, P5, P6, Percentage, P7, P8, P9; // Padding
         }
 
         [STAThread]
@@ -154,13 +142,13 @@ namespace MiniTri
                                   });
 
 
-            // Can check if uniforms exist
-            var shaderReflector = new ShaderReflection(pixelShaderByteCode);
-            var boundResources = shaderReflector.Description.BoundResources;
+            //// Can check if uniforms exist
+            //var shaderReflector = new ShaderReflection(pixelShaderByteCode);
+            //var boundResources = shaderReflector.Description.BoundResources;
 
-            InputBindingDescription description1 = shaderReflector.GetResourceBindingDescription(0);
-            InputBindingDescription description2 = shaderReflector.GetResourceBindingDescription(1);
-            InputBindingDescription description3 = shaderReflector.GetResourceBindingDescription(2);
+            //InputBindingDescription description1 = shaderReflector.GetResourceBindingDescription(0);
+            //InputBindingDescription description2 = shaderReflector.GetResourceBindingDescription(1);
+            //InputBindingDescription description3 = shaderReflector.GetResourceBindingDescription(2);
 
             // Prepare All the stages
             context.InputAssembler.InputLayout = layout;
@@ -171,36 +159,28 @@ namespace MiniTri
             context.PixelShader.Set(pixelShader);
             context.OutputMerger.SetTargets(renderView);
 
-            var floatBufferDescription = new BufferDescription
-                {
-                    Usage = ResourceUsage.Default,
-                    SizeInBytes = sizeof (BiasStruct),
-                    BindFlags = BindFlags.ConstantBuffer
-                };
+            var constantsBuffer = new Buffer(device, new BufferDescription
+            {
+                Usage = ResourceUsage.Default,
+                SizeInBytes = sizeof(ShaderUniforms),
+                BindFlags = BindFlags.ConstantBuffer
+            });
 
-            var bse = new BaseStruct {Base = 0.5f};
-            var baseBuffer = new Buffer(device, floatBufferDescription);
-            var baseData = new DataStream(sizeof(BaseStruct), true, true);
-            baseData.Write(bse);
-            baseData.Position = 0;
-            context.UpdateSubresource(new DataBox(baseData.PositionPointer, 0, 0), baseBuffer, 0);
-            context.PixelShader.SetConstantBuffer(0, baseBuffer);
+            var shaderUniforms = new ShaderUniforms
+            {
+                Base = 1.0f,
+                Bias = 1.0f,
+                Percentage = 1.0f
+            };
 
-            var bias = new BiasStruct {Bias = 0.5f};
-            var biasBuffer = new Buffer(device, floatBufferDescription);
-            var biasData = new DataStream(sizeof(BiasStruct), true, true);
-            biasData.Write(bias);
-            biasData.Position = 0;
-            context.UpdateSubresource(new DataBox(biasData.PositionPointer, 0, 0), biasBuffer, 0);
-            context.PixelShader.SetConstantBuffer(1, biasBuffer);
+            var data = new DataStream(sizeof(ShaderUniforms), true, true);
+            data.Write(shaderUniforms);
+            data.Position = 0;
 
-            var percentage = new PercentageStruct {Percentage = 0.5f};
-            var percentageBuffer = new Buffer(device, floatBufferDescription);
-            var percentageData = new DataStream(sizeof(PercentageStruct), true, true);
-            percentageData.Write(percentage);
-            percentageData.Position = 0;
-            context.UpdateSubresource(new DataBox(percentageData.PositionPointer, 0, 0), percentageBuffer, 0);
-            context.PixelShader.SetConstantBuffer(2, percentageBuffer);
+            context.UpdateSubresource(new DataBox(data.PositionPointer, 0, 0), constantsBuffer, 0);
+            context.PixelShader.SetConstantBuffer(0, constantsBuffer);
+
+
 
             var texture = Texture2D.FromFile<Texture2D>(device, "saddog.jpg");
             var textureView = new ShaderResourceView(device, texture);
