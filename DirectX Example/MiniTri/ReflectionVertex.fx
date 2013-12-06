@@ -41,7 +41,7 @@ VS_OUTPUT main(VS_INPUT input)
     VS_OUTPUT output;
     output.gl_Position.x = gl_Position.x;
     output.gl_Position.y = gl_Position.y;
-    output.gl_Position.z = (gl_Position.z + gl_Position.w) * 0.5;
+    output.gl_Position.z = 0.0;
     output.gl_Position.w = gl_Position.w;
     output.v0 = _textureCoordinateVarying;
 

@@ -33,9 +33,10 @@ void gl_main()
 float2 _inverseCoordinates = _textureCoordinateVarying;
 (_inverseCoordinates.y = (1.0 - _inverseCoordinates.y));
 (gl_Color[0] = gl_texture2D(texture__Texture0, sampler__Texture0, _inverseCoordinates));
-float _alpha = ((1.0 - min(pow((_textureCoordinateVarying.y / _Percentage), _Bias), 1.0)) * _Base);
-(gl_Color[0].w *= _alpha);
-(gl_Color[0].xyz *= _alpha);
+//float _alpha = ((1.0 - min(pow((_textureCoordinateVarying.y / _Percentage), _Bias), 1.0)) * _Base);
+//(gl_Color[0].w *= _alpha);
+//(gl_Color[0].xyz *= _alpha);
+(gl_Color[0].xyz *= _Percentage);
 }
 }
 ;
@@ -61,6 +62,8 @@ PS_OUTPUT main(PS_INPUT input)
     _textureCoordinateVarying = input.v0.xy;
 
     gl_main();
+
+	//gl_Color[0] = float4(1,0,0,1);
 
     PS_OUTPUT output;
     output.gl_Color0 = gl_Color[0];

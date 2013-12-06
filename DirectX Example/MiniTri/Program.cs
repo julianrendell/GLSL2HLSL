@@ -61,9 +61,21 @@ namespace MiniTri
     internal static class Program
     {
         [StructLayout(LayoutKind.Sequential)]
-        struct ColorUniforms
+        struct BaseStruct
         {
-            public float R, G, B, A;
+            public float Base, P1, P2, P3; // Padding
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct BiasStruct
+        {
+            public float Bias, P1, P2, P3; // Padding
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct PercentageStruct
+        {
+            public float Percentage, P1, P2, P3; // Padding
         }
 
         [STAThread]
@@ -113,10 +125,10 @@ namespace MiniTri
             context.OutputMerger.SetBlendState(blendState, new SharpDX.Color4(1.0f), -1);
 
             // Compile Vertex and Pixel shaders
-            var vertexShaderByteCode = ShaderBytecode.CompileFromFile("HelloTriangleVertex.fx", "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
+            var vertexShaderByteCode = ShaderBytecode.CompileFromFile("ReflectionVertex.fx", "main", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             var vertexShader = new VertexShader(device, vertexShaderByteCode);
 
-            var pixelShaderByteCode = ShaderBytecode.CompileFromFile("HelloTriangleFragment.fx", "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
+            var pixelShaderByteCode = ShaderBytecode.CompileFromFile("ReflectionFragment.fx", "main", "ps_4_0", ShaderFlags.None, EffectFlags.None);
             var pixelShader = new PixelShader(device, pixelShaderByteCode);
 
             // Layout from VertexShader input signature
@@ -141,6 +153,15 @@ namespace MiniTri
                                        1.0f, -1.0f, -1.0f, 1.0f,     1.0f, 1.0f,
                                   });
 
+
+            // Can check if uniforms exist
+            var shaderReflector = new ShaderReflection(pixelShaderByteCode);
+            var boundResources = shaderReflector.Description.BoundResources;
+
+            InputBindingDescription description1 = shaderReflector.GetResourceBindingDescription(0);
+            InputBindingDescription description2 = shaderReflector.GetResourceBindingDescription(1);
+            InputBindingDescription description3 = shaderReflector.GetResourceBindingDescription(2);
+
             // Prepare All the stages
             context.InputAssembler.InputLayout = layout;
             context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
@@ -150,27 +171,36 @@ namespace MiniTri
             context.PixelShader.Set(pixelShader);
             context.OutputMerger.SetTargets(renderView);
 
-            var getUniform = new Buffer(device, new BufferDescription
-            {
-                Usage = ResourceUsage.Default,
-                SizeInBytes = sizeof(ColorUniforms),
-                BindFlags = BindFlags.ConstantBuffer
-            });
-
-            var cb = new ColorUniforms
+            var floatBufferDescription = new BufferDescription
                 {
-                    R = 0.79f,
-                    G = 0.5f,
-                    B = 1.0f,
-                    A = 0.5f
+                    Usage = ResourceUsage.Default,
+                    SizeInBytes = sizeof (BiasStruct),
+                    BindFlags = BindFlags.ConstantBuffer
                 };
 
-            var data = new DataStream(sizeof(ColorUniforms), true, true);
-            data.Write(cb);
-            data.Position = 0;
+            var bse = new BaseStruct {Base = 0.5f};
+            var baseBuffer = new Buffer(device, floatBufferDescription);
+            var baseData = new DataStream(sizeof(BaseStruct), true, true);
+            baseData.Write(bse);
+            baseData.Position = 0;
+            context.UpdateSubresource(new DataBox(baseData.PositionPointer, 0, 0), baseBuffer, 0);
+            context.PixelShader.SetConstantBuffer(0, baseBuffer);
 
-            context.UpdateSubresource(new DataBox(data.PositionPointer, 0, 0), getUniform, 0);
-            context.PixelShader.SetConstantBuffer(0, getUniform);
+            var bias = new BiasStruct {Bias = 0.5f};
+            var biasBuffer = new Buffer(device, floatBufferDescription);
+            var biasData = new DataStream(sizeof(BiasStruct), true, true);
+            biasData.Write(bias);
+            biasData.Position = 0;
+            context.UpdateSubresource(new DataBox(biasData.PositionPointer, 0, 0), biasBuffer, 0);
+            context.PixelShader.SetConstantBuffer(1, biasBuffer);
+
+            var percentage = new PercentageStruct {Percentage = 0.5f};
+            var percentageBuffer = new Buffer(device, floatBufferDescription);
+            var percentageData = new DataStream(sizeof(PercentageStruct), true, true);
+            percentageData.Write(percentage);
+            percentageData.Position = 0;
+            context.UpdateSubresource(new DataBox(percentageData.PositionPointer, 0, 0), percentageBuffer, 0);
+            context.PixelShader.SetConstantBuffer(2, percentageBuffer);
 
             var texture = Texture2D.FromFile<Texture2D>(device, "saddog.jpg");
             var textureView = new ShaderResourceView(device, texture);

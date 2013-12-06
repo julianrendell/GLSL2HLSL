@@ -9,8 +9,8 @@ cbuffer DriverConstants : register(b1)
 {
 };
 
-Texture2D picture;
-SamplerState pictureSampler;
+uniform Texture2D picture;
+uniform SamplerState pictureSampler;
 uniform float4 Color : register(c0);
 
 #define GL_USES_FRAG_COLOR
